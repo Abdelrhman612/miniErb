@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@theme {
+  --font-cairo: "Cairo", sans-serif;
+}
+
+html, body {
+  font-family: "Cairo", "Inter", system-ui, -apple-system, sans-serif;
+}
