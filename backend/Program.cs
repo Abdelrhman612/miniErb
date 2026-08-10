@@ -1,5 +1,3 @@
-using MiniERP.API.Interfaces;
-using MiniERP.API.Services;
 using MiniERP.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +11,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 // Register services
-builder.Services.AddScoped<IHealthService, HealthService>();
 
 // Configure CORS for local development
 builder.Services.AddCors(options =>

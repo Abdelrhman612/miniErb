@@ -3127,11 +3127,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/abdelrahman-ayman/Projects/miniErb/MiniERP.API/MiniERP.API.csproj",
-      "projectName": "MiniERP.API",
-      "projectPath": "/home/abdelrahman-ayman/Projects/miniErb/MiniERP.API/MiniERP.API.csproj",
+      "projectUniqueName": "/home/abdelrahman-ayman/Projects/miniErb/backend/backend.csproj",
+      "projectName": "backend",
+      "projectPath": "/home/abdelrahman-ayman/Projects/miniErb/backend/backend.csproj",
       "packagesPath": "/home/abdelrahman-ayman/.nuget/packages/",
-      "outputPath": "/home/abdelrahman-ayman/Projects/miniErb/MiniERP.API/obj/",
+      "outputPath": "/home/abdelrahman-ayman/Projects/miniErb/backend/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/abdelrahman-ayman/.nuget/NuGet/NuGet.Config"

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "k7ZqQDNeS8w=",
+  "dgSpecHash": "NyxIjvwLs94=",
   "success": true,
-  "projectFilePath": "/home/abdelrahman-ayman/Projects/miniErb/MiniERP.API/MiniERP.API.csproj",
+  "projectFilePath": "/home/abdelrahman-ayman/Projects/miniErb/backend/backend.csproj",
   "expectedPackageFiles": [
     "/home/abdelrahman-ayman/.nuget/packages/azure.core/1.47.1/azure.core.1.47.1.nupkg.sha512",
     "/home/abdelrahman-ayman/.nuget/packages/azure.identity/1.14.2/azure.identity.1.14.2.nupkg.sha512",
@@ -58,9 +58,9 @@
       "code": "NU1903",
       "level": "Warning",
       "message": "Package 'Microsoft.OpenApi' 2.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-v5pm-xwqc-g5wc",
-      "projectPath": "/home/abdelrahman-ayman/Projects/miniErb/MiniERP.API/MiniERP.API.csproj",
+      "projectPath": "/home/abdelrahman-ayman/Projects/miniErb/backend/backend.csproj",
       "warningLevel": 1,
-      "filePath": "/home/abdelrahman-ayman/Projects/miniErb/MiniERP.API/MiniERP.API.csproj",
+      "filePath": "/home/abdelrahman-ayman/Projects/miniErb/backend/backend.csproj",
       "libraryId": "Microsoft.OpenApi",
       "targetGraphs": [
         "net10.0"
