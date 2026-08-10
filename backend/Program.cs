@@ -1,23 +1,44 @@
+using backend.Database;
+using backend.Interfaces;
+using backend.Repositories;
+using backend.Services;
+using Microsoft.EntityFrameworkCore;
 using MiniERP.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// ── Database ─────────────────────────────────────────────────────────────────
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException(
+        "Connection string 'DefaultConnection' not found. " +
+        "Set it in appsettings.Development.json or via the " +
+        "ConnectionStrings__DefaultConnection environment variable.");
 
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+// ── Repositories ─────────────────────────────────────────────────────────────
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
+
+// ── Services ──────────────────────────────────────────────────────────────────
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IWarehouseService, WarehouseService>();
+
+// ── MVC / OpenAPI ─────────────────────────────────────────────────────────────
+builder.Services.AddOpenApi();
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnet/core/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-// Register services
-
-// Configure CORS for local development
+// ── CORS ──────────────────────────────────────────────────────────────────────
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:3001")
+        policy.WithOrigins(
+                builder.Configuration["Cors:AllowedOrigins"] ?? "http://localhost:3001")
               .AllowAnyMethod()
               .AllowAnyHeader();
     });
@@ -25,25 +46,24 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Global exception handler middleware should be the first middleware registered
+// ── Middleware ────────────────────────────────────────────────────────────────
+// Global exception handler must be the first middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
-// Enable CORS before authorization
 app.UseCors("CorsPolicy");
-
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-app.MapGet("/", () => "Hello World!");
+app.MapGet("/", () => "Sewing Parts ERP API is running.");
 
 app.Run();
+
 
 
 

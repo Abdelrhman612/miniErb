@@ -8,6 +8,9 @@ const api = axios.create({
   },
 });
 
-
+export const checkHealth = async () => {
+  const response = await api.get<{ message: string }>('/api/health');
+  return response.data;
+};
 
 export default api;
