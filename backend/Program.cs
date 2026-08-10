@@ -21,11 +21,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 
 // ── Services ──────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
 
 // ── MVC / OpenAPI ─────────────────────────────────────────────────────────────
 builder.Services.AddOpenApi();

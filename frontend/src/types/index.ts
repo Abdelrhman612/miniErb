@@ -81,6 +81,70 @@ export interface UpdateWarehouseDto {
   isActive: boolean;
 }
 
+export interface Customer {
+  id: number;
+  name: string;
+  phone: string;
+  phone2?: string;
+  address?: string;
+  notes?: string;
+  openingBalance: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CreateCustomerDto {
+  name: string;
+  phone: string;
+  phone2?: string;
+  address?: string;
+  notes?: string;
+  openingBalance: number;
+}
+
+export interface UpdateCustomerDto {
+  name: string;
+  phone: string;
+  phone2?: string;
+  address?: string;
+  notes?: string;
+  openingBalance: number;
+  isActive: boolean;
+}
+
+export interface Supplier {
+  id: number;
+  name: string;
+  phone: string;
+  phone2?: string;
+  address?: string;
+  notes?: string;
+  openingBalance: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CreateSupplierDto {
+  name: string;
+  phone: string;
+  phone2?: string;
+  address?: string;
+  notes?: string;
+  openingBalance: number;
+}
+
+export interface UpdateSupplierDto {
+  name: string;
+  phone: string;
+  phone2?: string;
+  address?: string;
+  notes?: string;
+  openingBalance: number;
+  isActive: boolean;
+}
+
 export interface ApiError {
   statusCode: number;
   message: string;

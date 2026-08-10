@@ -3,6 +3,8 @@ import { MainLayout } from './components/layout/MainLayout';
 import { ProductsPage } from './pages/ProductsPage';
 import { CategoriesPage } from './pages/CategoriesPage';
 import { WarehousesPage } from './pages/WarehousesPage';
+import { CustomersPage } from './pages/CustomersPage';
+import { SuppliersPage } from './pages/SuppliersPage';
 import './index.css';
 
 function App() {
@@ -14,6 +16,8 @@ function App() {
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/warehouses" element={<WarehousesPage />} />
+          <Route path="/customers" element={<CustomersPage />} />
+          <Route path="/suppliers" element={<SuppliersPage />} />
         </Routes>
       </MainLayout>
     </BrowserRouter>
