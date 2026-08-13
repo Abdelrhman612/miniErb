@@ -176,7 +176,7 @@ public class SalesInvoiceService : ISalesInvoiceService
                     WarehouseId = invoice.WarehouseId,
                     ProductId = item.ProductId,
                     Quantity = -item.Quantity,
-                    MovementType = "Sale",
+                    MovementType = "OUT",
                     CreatedAt = DateTime.UtcNow
                 };
                 _context.InventoryTransactions.Add(invTx);
@@ -255,7 +255,7 @@ public class SalesInvoiceService : ISalesInvoiceService
                         WarehouseId = invoice.WarehouseId,
                         ProductId = item.ProductId,
                         Quantity = item.Quantity,
-                        MovementType = "SaleCancel",
+                        MovementType = "IN",
                         CreatedAt = DateTime.UtcNow
                     };
                     _context.InventoryTransactions.Add(invTx);

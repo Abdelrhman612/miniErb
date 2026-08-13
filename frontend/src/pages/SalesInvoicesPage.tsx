@@ -56,6 +56,27 @@ function SalesInvoiceForm({
     const [selectedProductId, setSelectedProductId] = useState<number>(products[0]?.id ?? 0);
     const [itemQuantity, setItemQuantity] = useState<number>(1);
     const [itemUnitPrice, setItemUnitPrice] = useState<number>(0);
+    const [warehouseInventory, setWarehouseInventory] = useState<Record<number, number>>({});
+
+    useEffect(() => {
+        if (!warehouseId) {
+            setWarehouseInventory({});
+            return;
+        }
+        warehouseService.getInventory(warehouseId)
+            .then(res => {
+                const map: Record<number, number> = {};
+                res.items.forEach(i => {
+                    map[i.productId] = i.quantity;
+                });
+                setWarehouseInventory(map);
+            })
+            .catch(() => {
+                setWarehouseInventory({});
+            });
+    }, [warehouseId]);
+
+    const availableQty = selectedProductId ? (warehouseInventory[selectedProductId] ?? 0) : 0;
 
     const [formError, setFormError] = useState<string>('');
 
@@ -96,6 +117,10 @@ function SalesInvoiceForm({
         }
         if (itemQuantity <= 0) {
             setFormError('الكمية يجب أن تكون أكبر من الصفر.');
+            return;
+        }
+        if (itemQuantity > availableQty) {
+            setFormError('الكمية المطلوبة أكبر من الكمية المتاحة');
             return;
         }
         if (itemUnitPrice < 0) {
@@ -301,6 +326,7 @@ function SalesInvoiceForm({
                             onChange={e => setItemQuantity(Number(e.target.value))}
                             className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-100 text-sm"
                         />
+                        <p className="text-xs text-slate-400 mt-1">المتاح في المخزن: <span className="font-bold text-emerald-400">{availableQty}</span></p>
                     </div>
 
                     <div className="md:col-span-3">

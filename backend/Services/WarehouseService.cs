@@ -1,17 +1,21 @@
+using backend.Database;
 using backend.DTOs;
 using backend.Exceptions;
 using backend.Interfaces;
 using backend.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Services;
 
 public class WarehouseService : IWarehouseService
 {
     private readonly IWarehouseRepository _warehouseRepository;
+    private readonly AppDbContext _context;
 
-    public WarehouseService(IWarehouseRepository warehouseRepository)
+    public WarehouseService(IWarehouseRepository warehouseRepository, AppDbContext context)
     {
         _warehouseRepository = warehouseRepository;
+        _context = context;
     }
 
     public async Task<IEnumerable<WarehouseResponseDto>> GetAllAsync()
@@ -26,6 +30,31 @@ public class WarehouseService : IWarehouseService
             ?? throw new NotFoundException($"المخزن بالمعرف {id} غير موجود.");
 
         return MapToResponse(warehouse);
+    }
+
+    public async Task<WarehouseInventoryResponseDto> GetInventoryAsync(int warehouseId)
+    {
+        var warehouse = await _warehouseRepository.GetByIdAsync(warehouseId)
+            ?? throw new NotFoundException($"المخزن بالمعرف {warehouseId} غير موجود.");
+
+        var stocks = await _context.WarehouseStocks
+            .Include(s => s.Product)
+            .Where(s => s.WarehouseId == warehouseId && s.Quantity > 0)
+            .ToListAsync();
+
+        return new WarehouseInventoryResponseDto
+        {
+            WarehouseId = warehouse.Id,
+            WarehouseName = warehouse.Name,
+            WarehouseCode = warehouse.Code,
+            Items = stocks.Select(s => new WarehouseInventoryItemDto
+            {
+                ProductId = s.ProductId,
+                ProductName = s.Product?.Name ?? string.Empty,
+                ProductCode = s.Product?.Code ?? string.Empty,
+                Quantity = s.Quantity
+            }).ToList()
+        };
     }
 
     public async Task<WarehouseResponseDto> CreateAsync(CreateWarehouseDto dto)

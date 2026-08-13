@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import { warehouseService } from '../services/api';
 import type { Warehouse, CreateWarehouseDto, UpdateWarehouseDto } from '../types';
 import { Modal } from '../components/ui/Modal';
@@ -69,6 +70,7 @@ function WarehouseForm({ initial, onSave, onCancel, saving }: WarehouseFormProps
 
 // ── Warehouses Page ────────────────────────────────────────────────────────────
 export function WarehousesPage() {
+  const navigate = useNavigate();
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -203,6 +205,12 @@ export function WarehousesPage() {
                 )}
 
                 <div className="flex gap-2 pt-1 border-t border-slate-800">
+                  <button onClick={() => navigate(`/warehouses/${wh.id}`)} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs text-slate-300 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors font-medium">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                    عرض المخزون
+                  </button>
                   <button onClick={() => openEdit(wh)} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors">
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

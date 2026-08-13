@@ -68,6 +68,20 @@ export interface Warehouse {
   createdAt: string;
 }
 
+export interface WarehouseInventoryItem {
+  productId: number;
+  productName: string;
+  productCode: string;
+  quantity: number;
+}
+
+export interface WarehouseInventory {
+  warehouseId: number;
+  warehouseName: string;
+  warehouseCode: string;
+  items: WarehouseInventoryItem[];
+}
+
 export interface CreateWarehouseDto {
   code: string;
   name: string;

@@ -29,6 +29,13 @@ public class WarehousesController : ControllerBase
         return Ok(warehouse);
     }
 
+    [HttpGet("{id:int}/inventory")]
+    public async Task<IActionResult> GetInventory(int id)
+    {
+        var inventory = await _warehouseService.GetInventoryAsync(id);
+        return Ok(inventory);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateWarehouseDto dto)
     {

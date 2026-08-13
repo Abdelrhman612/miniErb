@@ -173,7 +173,7 @@ public class PurchaseInvoiceService : IPurchaseInvoiceService
                     WarehouseId = invoice.WarehouseId,
                     ProductId = item.ProductId,
                     Quantity = item.Quantity,
-                    MovementType = "Purchase",
+                    MovementType = "IN",
                     CreatedAt = DateTime.UtcNow
                 };
                 _context.InventoryTransactions.Add(invTx);
@@ -239,7 +239,7 @@ public class PurchaseInvoiceService : IPurchaseInvoiceService
                         WarehouseId = invoice.WarehouseId,
                         ProductId = item.ProductId,
                         Quantity = -item.Quantity,
-                        MovementType = "PurchaseCancel",
+                        MovementType = "OUT",
                         CreatedAt = DateTime.UtcNow
                     };
                     _context.InventoryTransactions.Add(invTx);

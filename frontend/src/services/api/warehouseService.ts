@@ -1,5 +1,5 @@
 import api from './api';
-import type { Warehouse, CreateWarehouseDto, UpdateWarehouseDto } from '../../types';
+import type { Warehouse, CreateWarehouseDto, UpdateWarehouseDto, WarehouseInventory } from '../../types';
 
 export const warehouseService = {
   getAll: async (): Promise<Warehouse[]> => {
@@ -9,6 +9,11 @@ export const warehouseService = {
 
   getById: async (id: number): Promise<Warehouse> => {
     const response = await api.get<Warehouse>(`/api/warehouses/${id}`);
+    return response.data;
+  },
+
+  getInventory: async (id: number): Promise<WarehouseInventory> => {
+    const response = await api.get<WarehouseInventory>(`/api/warehouses/${id}/inventory`);
     return response.data;
   },
 
