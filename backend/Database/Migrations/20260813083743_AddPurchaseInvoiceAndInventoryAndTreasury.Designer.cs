@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace backend.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260813083743_AddPurchaseInvoiceAndInventoryAndTreasury")]
+    partial class AddPurchaseInvoiceAndInventoryAndTreasury
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -128,9 +131,6 @@ namespace backend.Database.Migrations
                     b.Property<decimal>("Quantity")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("SalesInvoiceId")
-                        .HasColumnType("int");
-
                     b.Property<int>("WarehouseId")
                         .HasColumnType("int");
 
@@ -139,8 +139,6 @@ namespace backend.Database.Migrations
                     b.HasIndex("ProductId");
 
                     b.HasIndex("PurchaseInvoiceId");
-
-                    b.HasIndex("SalesInvoiceId");
 
                     b.HasIndex("WarehouseId");
 
@@ -296,91 +294,6 @@ namespace backend.Database.Migrations
                     b.ToTable("PurchaseInvoiceItems", (string)null);
                 });
 
-            modelBuilder.Entity("backend.Models.SalesInvoice", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("InvoiceDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("InvoiceNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<decimal>("PaidAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("PaymentType")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("WarehouseId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("WarehouseId");
-
-                    b.ToTable("SalesInvoices", (string)null);
-                });
-
-            modelBuilder.Entity("backend.Models.SalesInvoiceItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("SalesInvoiceId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Total")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("SalesInvoiceId");
-
-                    b.ToTable("SalesInvoiceItems", (string)null);
-                });
-
             modelBuilder.Entity("backend.Models.Supplier", b =>
                 {
                     b.Property<int>("Id")
@@ -451,9 +364,6 @@ namespace backend.Database.Migrations
                     b.Property<int?>("PurchaseInvoiceId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SalesInvoiceId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -462,8 +372,6 @@ namespace backend.Database.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PurchaseInvoiceId");
-
-                    b.HasIndex("SalesInvoiceId");
 
                     b.ToTable("TreasuryTransactions", (string)null);
                 });
@@ -549,11 +457,6 @@ namespace backend.Database.Migrations
                         .HasForeignKey("PurchaseInvoiceId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("backend.Models.SalesInvoice", "SalesInvoice")
-                        .WithMany()
-                        .HasForeignKey("SalesInvoiceId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("backend.Models.Warehouse", "Warehouse")
                         .WithMany()
                         .HasForeignKey("WarehouseId")
@@ -563,8 +466,6 @@ namespace backend.Database.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("PurchaseInvoice");
-
-                    b.Navigation("SalesInvoice");
 
                     b.Navigation("Warehouse");
                 });
@@ -618,44 +519,6 @@ namespace backend.Database.Migrations
                     b.Navigation("PurchaseInvoice");
                 });
 
-            modelBuilder.Entity("backend.Models.SalesInvoice", b =>
-                {
-                    b.HasOne("backend.Models.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("backend.Models.Warehouse", "Warehouse")
-                        .WithMany()
-                        .HasForeignKey("WarehouseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Warehouse");
-                });
-
-            modelBuilder.Entity("backend.Models.SalesInvoiceItem", b =>
-                {
-                    b.HasOne("backend.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("backend.Models.SalesInvoice", "SalesInvoice")
-                        .WithMany("Items")
-                        .HasForeignKey("SalesInvoiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("SalesInvoice");
-                });
-
             modelBuilder.Entity("backend.Models.TreasuryTransaction", b =>
                 {
                     b.HasOne("backend.Models.PurchaseInvoice", "PurchaseInvoice")
@@ -663,14 +526,7 @@ namespace backend.Database.Migrations
                         .HasForeignKey("PurchaseInvoiceId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("backend.Models.SalesInvoice", "SalesInvoice")
-                        .WithMany()
-                        .HasForeignKey("SalesInvoiceId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.Navigation("PurchaseInvoice");
-
-                    b.Navigation("SalesInvoice");
                 });
 
             modelBuilder.Entity("backend.Models.WarehouseStock", b =>
@@ -698,11 +554,6 @@ namespace backend.Database.Migrations
                 });
 
             modelBuilder.Entity("backend.Models.PurchaseInvoice", b =>
-                {
-                    b.Navigation("Items");
-                });
-
-            modelBuilder.Entity("backend.Models.SalesInvoice", b =>
                 {
                     b.Navigation("Items");
                 });

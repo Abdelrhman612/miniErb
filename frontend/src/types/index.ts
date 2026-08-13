@@ -149,3 +149,115 @@ export interface ApiError {
   statusCode: number;
   message: string;
 }
+
+export const PaymentType = {
+  Cash: 1,
+  Credit: 2,
+  Partial: 3,
+} as const;
+export type PaymentType = typeof PaymentType[keyof typeof PaymentType];
+
+export const PurchaseInvoiceStatus = {
+  Draft: 1,
+  Confirmed: 2,
+  Cancelled: 3,
+} as const;
+export type PurchaseInvoiceStatus = typeof PurchaseInvoiceStatus[keyof typeof PurchaseInvoiceStatus];
+
+export interface CreatePurchaseInvoiceItemDto {
+  productId: number;
+  quantity: number;
+  unitCost: number;
+}
+
+export interface CreatePurchaseInvoiceDto {
+  invoiceNumber?: string;
+  supplierId: number;
+  warehouseId: number;
+  invoiceDate: string;
+  paymentType: PaymentType;
+  paidAmount: number;
+  notes?: string;
+  items: CreatePurchaseInvoiceItemDto[];
+}
+
+export interface UpdatePurchaseInvoiceDto extends CreatePurchaseInvoiceDto {}
+
+export interface PurchaseInvoiceItemResponseDto {
+  id: number;
+  productId: number;
+  productCode: string;
+  productName: string;
+  quantity: number;
+  unitCost: number;
+  total: number;
+}
+
+export interface PurchaseInvoiceResponseDto {
+  id: number;
+  invoiceNumber: string;
+  supplierId: number;
+  supplierName: string;
+  warehouseId: number;
+  warehouseName: string;
+  invoiceDate: string;
+  paymentType: PaymentType;
+  paymentTypeName: string;
+  paidAmount: number;
+  totalAmount: number;
+  status: PurchaseInvoiceStatus;
+  statusName: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt?: string;
+  items: PurchaseInvoiceItemResponseDto[];
+}
+
+export interface CreateSalesInvoiceItemDto {
+  productId: number;
+  quantity: number;
+  unitPrice: number;
+}
+
+export interface CreateSalesInvoiceDto {
+  invoiceNumber?: string;
+  customerId: number;
+  warehouseId: number;
+  invoiceDate: string;
+  paymentType: PaymentType;
+  paidAmount: number;
+  notes?: string;
+  items: CreateSalesInvoiceItemDto[];
+}
+
+export interface UpdateSalesInvoiceDto extends CreateSalesInvoiceDto {}
+
+export interface SalesInvoiceItemResponseDto {
+  id: number;
+  productId: number;
+  productCode: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
+export interface SalesInvoiceResponseDto {
+  id: number;
+  invoiceNumber: string;
+  customerId: number;
+  customerName: string;
+  warehouseId: number;
+  warehouseName: string;
+  invoiceDate: string;
+  paymentType: PaymentType;
+  paymentTypeName: string;
+  paidAmount: number;
+  totalAmount: number;
+  status: PurchaseInvoiceStatus;
+  statusName: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt?: string;
+  items: SalesInvoiceItemResponseDto[];
+}

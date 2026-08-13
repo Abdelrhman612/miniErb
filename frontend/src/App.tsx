@@ -5,6 +5,8 @@ import { CategoriesPage } from './pages/CategoriesPage';
 import { WarehousesPage } from './pages/WarehousesPage';
 import { CustomersPage } from './pages/CustomersPage';
 import { SuppliersPage } from './pages/SuppliersPage';
+import { PurchaseInvoicesPage } from './pages/PurchaseInvoicesPage';
+import { SalesInvoicesPage } from './pages/SalesInvoicesPage';
 import './index.css';
 
 function App() {
@@ -18,6 +20,9 @@ function App() {
           <Route path="/warehouses" element={<WarehousesPage />} />
           <Route path="/customers" element={<CustomersPage />} />
           <Route path="/suppliers" element={<SuppliersPage />} />
+          <Route path="/purchase-invoices" element={<PurchaseInvoicesPage />} />
+          <Route path="/sales/invoices" element={<SalesInvoicesPage />} />
+          <Route path="/sales-invoices" element={<SalesInvoicesPage />} />
         </Routes>
       </MainLayout>
     </BrowserRouter>
