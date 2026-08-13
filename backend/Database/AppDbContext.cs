@@ -21,7 +21,8 @@ public class AppDbContext : DbContext
     public DbSet<SalesInvoiceItem> SalesInvoiceItems => Set<SalesInvoiceItem>();
     public DbSet<WarehouseStock> WarehouseStocks => Set<WarehouseStock>();
     public DbSet<InventoryTransaction> InventoryTransactions => Set<InventoryTransaction>();
-    public DbSet<TreasuryTransaction> TreasuryTransactions => Set<TreasuryTransaction>();
+    public DbSet<Account> Accounts => Set<Account>();
+    public DbSet<AccountTransaction> AccountTransactions => Set<AccountTransaction>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -38,6 +39,7 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new SalesInvoiceItemConfiguration());
         modelBuilder.ApplyConfiguration(new WarehouseStockConfiguration());
         modelBuilder.ApplyConfiguration(new InventoryTransactionConfiguration());
-        modelBuilder.ApplyConfiguration(new TreasuryTransactionConfiguration());
+        modelBuilder.ApplyConfiguration(new AccountConfiguration());
+        modelBuilder.ApplyConfiguration(new AccountTransactionConfiguration());
     }
 }

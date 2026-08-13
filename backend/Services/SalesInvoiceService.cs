@@ -185,15 +185,34 @@ public class SalesInvoiceService : ISalesInvoiceService
             // 5. Create Treasury Transaction if PaidAmount > 0 (Inflow)
             if (invoice.PaidAmount > 0)
             {
-                var treasuryTx = new TreasuryTransaction
+                var treasury = await _context.Accounts
+                    .FirstOrDefaultAsync(a => a.AccountType == "Treasury" && a.IsActive);
+                if (treasury == null)
                 {
-                    SalesInvoiceId = invoice.Id,
+                    treasury = new Account
+                    {
+                        Name = "الخزنة الرئيسية",
+                        Code = "CASH-001",
+                        AccountType = "Treasury",
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    _context.Accounts.Add(treasury);
+                    await _context.SaveChangesAsync();
+                }
+
+                var accountTx = new AccountTransaction
+                {
+                    AccountId = treasury.Id,
+                    TransactionType = TransactionType.Credit,
                     Amount = invoice.PaidAmount,
-                    Type = "Inflow",
                     Description = $"تحصيل فاتورة مبيعات رقم {invoice.InvoiceNumber}",
+                    ReferenceType = "SalesInvoice",
+                    ReferenceId = invoice.Id,
+                    TransactionDate = invoice.InvoiceDate,
                     CreatedAt = DateTime.UtcNow
                 };
-                _context.TreasuryTransactions.Add(treasuryTx);
+                _context.AccountTransactions.Add(accountTx);
             }
 
             await _context.SaveChangesAsync();
@@ -264,15 +283,23 @@ public class SalesInvoiceService : ISalesInvoiceService
                 // Reverse treasury if paid amount > 0
                 if (invoice.PaidAmount > 0)
                 {
-                    var treasuryTx = new TreasuryTransaction
+                    var treasury = await _context.Accounts
+                        .FirstOrDefaultAsync(a => a.AccountType == "Treasury" && a.IsActive);
+                    if (treasury != null)
                     {
-                        SalesInvoiceId = invoice.Id,
-                        Amount = invoice.PaidAmount,
-                        Type = "Outflow",
-                        Description = $"رد مبلغ إلغاء فاتورة مبيعات رقم {invoice.InvoiceNumber}",
-                        CreatedAt = DateTime.UtcNow
-                    };
-                    _context.TreasuryTransactions.Add(treasuryTx);
+                        var accountTx = new AccountTransaction
+                        {
+                            AccountId = treasury.Id,
+                            TransactionType = TransactionType.Debit,
+                            Amount = invoice.PaidAmount,
+                            Description = $"رد مبلغ إلغاء فاتورة مبيعات رقم {invoice.InvoiceNumber}",
+                            ReferenceType = "SalesInvoiceCancellation",
+                            ReferenceId = invoice.Id,
+                            TransactionDate = DateTime.UtcNow,
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        _context.AccountTransactions.Add(accountTx);
+                    }
                 }
             }
 

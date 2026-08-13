@@ -275,3 +275,39 @@ export interface SalesInvoiceResponseDto {
   updatedAt?: string;
   items: SalesInvoiceItemResponseDto[];
 }
+
+export const TransactionType = {
+  Debit: 1,
+  Credit: 2,
+} as const;
+export type TransactionType = typeof TransactionType[keyof typeof TransactionType];
+
+export interface TreasuryResponseDto {
+  id: number;
+  name: string;
+  code: string;
+  accountType: string;
+  balance: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CreateTreasuryDto {
+  name: string;
+  code: string;
+  initialBalance: number;
+}
+
+export interface AccountTransactionResponseDto {
+  id: number;
+  accountId: number;
+  transactionType: TransactionType;
+  transactionTypeName: string;
+  amount: number;
+  description?: string;
+  referenceType?: string;
+  referenceId?: number;
+  transactionDate: string;
+  createdAt: string;
+}

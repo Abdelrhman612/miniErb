@@ -181,15 +181,34 @@ public class PurchaseInvoiceService : IPurchaseInvoiceService
 
             if (invoice.PaidAmount > 0)
             {
-                var treasuryTx = new TreasuryTransaction
+                var treasury = await _context.Accounts
+                    .FirstOrDefaultAsync(a => a.AccountType == "Treasury" && a.IsActive);
+                if (treasury == null)
                 {
-                    PurchaseInvoiceId = invoice.Id,
+                    treasury = new Account
+                    {
+                        Name = "الخزنة الرئيسية",
+                        Code = "CASH-001",
+                        AccountType = "Treasury",
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    _context.Accounts.Add(treasury);
+                    await _context.SaveChangesAsync();
+                }
+
+                var accountTx = new AccountTransaction
+                {
+                    AccountId = treasury.Id,
+                    TransactionType = TransactionType.Debit,
                     Amount = invoice.PaidAmount,
-                    Type = "Outflow",
                     Description = $"سداد فاتورة مشتريات رقم {invoice.InvoiceNumber}",
+                    ReferenceType = "PurchaseInvoice",
+                    ReferenceId = invoice.Id,
+                    TransactionDate = invoice.InvoiceDate,
                     CreatedAt = DateTime.UtcNow
                 };
-                _context.TreasuryTransactions.Add(treasuryTx);
+                _context.AccountTransactions.Add(accountTx);
             }
 
             await _context.SaveChangesAsync();
@@ -247,15 +266,23 @@ public class PurchaseInvoiceService : IPurchaseInvoiceService
 
                 if (invoice.PaidAmount > 0)
                 {
-                    var treasuryTx = new TreasuryTransaction
+                    var treasury = await _context.Accounts
+                        .FirstOrDefaultAsync(a => a.AccountType == "Treasury" && a.IsActive);
+                    if (treasury != null)
                     {
-                        PurchaseInvoiceId = invoice.Id,
-                        Amount = invoice.PaidAmount,
-                        Type = "Inflow",
-                        Description = $"استرداد مبلغ إلغاء فاتورة مشتريات رقم {invoice.InvoiceNumber}",
-                        CreatedAt = DateTime.UtcNow
-                    };
-                    _context.TreasuryTransactions.Add(treasuryTx);
+                        var accountTx = new AccountTransaction
+                        {
+                            AccountId = treasury.Id,
+                            TransactionType = TransactionType.Credit,
+                            Amount = invoice.PaidAmount,
+                            Description = $"استرداد مبلغ إلغاء فاتورة مشتريات رقم {invoice.InvoiceNumber}",
+                            ReferenceType = "PurchaseInvoiceCancellation",
+                            ReferenceId = invoice.Id,
+                            TransactionDate = DateTime.UtcNow,
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        _context.AccountTransactions.Add(accountTx);
+                    }
                 }
             }
 

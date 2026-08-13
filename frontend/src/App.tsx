@@ -8,6 +8,7 @@ import { CustomersPage } from './pages/CustomersPage';
 import { SuppliersPage } from './pages/SuppliersPage';
 import { PurchaseInvoicesPage } from './pages/PurchaseInvoicesPage';
 import { SalesInvoicesPage } from './pages/SalesInvoicesPage';
+import { TreasuryPage } from './pages/TreasuryPage';
 import './index.css';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/warehouses" element={<WarehousesPage />} />
           <Route path="/warehouses/:id" element={<WarehouseDetailsPage />} />
+          <Route path="/treasury" element={<TreasuryPage />} />
           <Route path="/customers" element={<CustomersPage />} />
           <Route path="/suppliers" element={<SuppliersPage />} />
           <Route path="/purchase-invoices" element={<PurchaseInvoicesPage />} />
