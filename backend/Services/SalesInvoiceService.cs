@@ -201,18 +201,60 @@ public class SalesInvoiceService : ISalesInvoiceService
                     await _context.SaveChangesAsync();
                 }
 
+                var customer = await _context.Customers.FindAsync(invoice.CustomerId);
                 var accountTx = new AccountTransaction
                 {
                     AccountId = treasury.Id,
                     TransactionType = TransactionType.Credit,
+                    Debit = 0,
+                    Credit = invoice.PaidAmount,
+                    PaidAmount = invoice.PaidAmount,
                     Amount = invoice.PaidAmount,
-                    Description = $"تحصيل فاتورة مبيعات رقم {invoice.InvoiceNumber}",
+                    PartyName = customer?.Name ?? string.Empty,
+                    Description = $"قبض نقدي من العميل ({customer?.Name ?? "العميل"}) - فاتورة مبيعات رقم {invoice.InvoiceNumber}",
                     ReferenceType = "SalesInvoice",
                     ReferenceId = invoice.Id,
                     TransactionDate = invoice.InvoiceDate,
                     CreatedAt = DateTime.UtcNow
                 };
                 _context.AccountTransactions.Add(accountTx);
+            }
+
+            // 6. Create Customer Account Transaction for confirmed sales invoice
+            {
+                var customerAccount = await _context.Accounts
+                    .FirstOrDefaultAsync(a => a.CustomerId == invoice.CustomerId);
+                if (customerAccount == null)
+                {
+                    var customer = await _context.Customers.FindAsync(invoice.CustomerId);
+                    customerAccount = new Account
+                    {
+                        CustomerId = invoice.CustomerId,
+                        Name = customer?.Name ?? "Customer",
+                        Code = $"CUS-{invoice.CustomerId}",
+                        AccountType = "Customer",
+                        IsActive = customer?.IsActive ?? true,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    _context.Accounts.Add(customerAccount);
+                    await _context.SaveChangesAsync();
+                }
+
+                var custTx = new AccountTransaction
+                {
+                    AccountId = customerAccount.Id,
+                    TransactionType = invoice.TotalAmount >= invoice.PaidAmount ? TransactionType.Debit : TransactionType.Credit,
+                    Debit = invoice.TotalAmount,
+                    Credit = invoice.PaidAmount,
+                    PaidAmount = invoice.PaidAmount,
+                    Amount = Math.Abs(invoice.TotalAmount - invoice.PaidAmount),
+                    Description = $"فاتورة مبيعات رقم {invoice.InvoiceNumber}",
+                    ReferenceType = "SalesInvoice",
+                    ReferenceId = invoice.Id,
+                    TransactionDate = invoice.InvoiceDate,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.AccountTransactions.Add(custTx);
             }
 
             await _context.SaveChangesAsync();
@@ -291,6 +333,9 @@ public class SalesInvoiceService : ISalesInvoiceService
                         {
                             AccountId = treasury.Id,
                             TransactionType = TransactionType.Debit,
+                            Debit = invoice.PaidAmount,
+                            Credit = 0,
+                            PaidAmount = invoice.PaidAmount,
                             Amount = invoice.PaidAmount,
                             Description = $"رد مبلغ إلغاء فاتورة مبيعات رقم {invoice.InvoiceNumber}",
                             ReferenceType = "SalesInvoiceCancellation",
@@ -299,6 +344,30 @@ public class SalesInvoiceService : ISalesInvoiceService
                             CreatedAt = DateTime.UtcNow
                         };
                         _context.AccountTransactions.Add(accountTx);
+                    }
+                }
+
+                // Reverse customer account
+                {
+                    var customerAccount = await _context.Accounts
+                        .FirstOrDefaultAsync(a => a.CustomerId == invoice.CustomerId);
+                    if (customerAccount != null)
+                    {
+                        var custReversalTx = new AccountTransaction
+                        {
+                            AccountId = customerAccount.Id,
+                            TransactionType = TransactionType.Credit,
+                            Debit = invoice.PaidAmount,
+                            Credit = invoice.TotalAmount,
+                            PaidAmount = invoice.PaidAmount,
+                            Amount = Math.Abs(invoice.TotalAmount - invoice.PaidAmount),
+                            Description = $"إلغاء فاتورة مبيعات رقم {invoice.InvoiceNumber}",
+                            ReferenceType = "SalesInvoiceCancellation",
+                            ReferenceId = invoice.Id,
+                            TransactionDate = DateTime.UtcNow,
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        _context.AccountTransactions.Add(custReversalTx);
                     }
                 }
             }

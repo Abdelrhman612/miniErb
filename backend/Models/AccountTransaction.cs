@@ -12,7 +12,11 @@ public class AccountTransaction
     public int AccountId { get; set; }
     public TransactionType TransactionType { get; set; }
     public decimal Amount { get; set; }
+    public decimal Debit { get; set; }
+    public decimal Credit { get; set; }
+    public decimal PaidAmount { get; set; }
     public string? Description { get; set; }
+    public string? PartyName { get; set; }
     public string? ReferenceType { get; set; } // "InitialBalance", "PurchaseInvoice", "SalesInvoice", etc.
     public int? ReferenceId { get; set; }
     public DateTime TransactionDate { get; set; } = DateTime.UtcNow;

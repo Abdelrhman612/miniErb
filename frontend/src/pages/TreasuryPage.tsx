@@ -222,6 +222,7 @@ export function TreasuryPage() {
                         <tr className="bg-slate-950/60 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-800">
                           <th className="px-6 py-4">التاريخ</th>
                           <th className="px-6 py-4">النوع</th>
+                          <th className="px-6 py-4">الطرف (العميل / المورد)</th>
                           <th className="px-6 py-4">المبلغ (جنيه)</th>
                           <th className="px-6 py-4">البيان</th>
                           <th className="px-6 py-4">المصدر / المرجع</th>
@@ -251,6 +252,15 @@ export function TreasuryPage() {
                                 >
                                   {isCredit ? 'دائن (قبض)' : 'مدين (صرف)'}
                                 </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap font-bold text-slate-200">
+                                {tx.partyName ? (
+                                  <span className="px-3 py-1 rounded-lg bg-slate-800/80 text-emerald-400 border border-slate-700">
+                                    {tx.partyName}
+                                  </span>
+                                ) : (
+                                  <span className="text-slate-500">-</span>
+                                )}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap font-bold">
                                 <span className={isCredit ? 'text-emerald-400' : 'text-rose-400'}>

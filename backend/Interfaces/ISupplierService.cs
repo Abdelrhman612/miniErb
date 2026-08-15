@@ -10,4 +10,6 @@ public interface ISupplierService
     Task<SupplierResponseDto> UpdateAsync(int id, UpdateSupplierDto dto);
     Task DeleteAsync(int id);
     Task HardDeleteAsync(int id);
+    Task<SupplierAccountResponseDto> GetAccountAsync(int supplierId);
+    Task<IEnumerable<AccountTransactionResponseDto>> GetAccountTransactionsAsync(int supplierId, DateTime? fromDate, DateTime? toDate);
 }

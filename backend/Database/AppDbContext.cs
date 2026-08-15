@@ -23,6 +23,10 @@ public class AppDbContext : DbContext
     public DbSet<InventoryTransaction> InventoryTransactions => Set<InventoryTransaction>();
     public DbSet<Account> Accounts => Set<Account>();
     public DbSet<AccountTransaction> AccountTransactions => Set<AccountTransaction>();
+    public DbSet<ReceiptVoucher> ReceiptVouchers => Set<ReceiptVoucher>();
+    public DbSet<PaymentVoucher> PaymentVouchers => Set<PaymentVoucher>();
+    public DbSet<JournalVoucher> JournalVouchers => Set<JournalVoucher>();
+    public DbSet<JournalVoucherItem> JournalVoucherItems => Set<JournalVoucherItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -41,5 +45,9 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new InventoryTransactionConfiguration());
         modelBuilder.ApplyConfiguration(new AccountConfiguration());
         modelBuilder.ApplyConfiguration(new AccountTransactionConfiguration());
+        modelBuilder.ApplyConfiguration(new ReceiptVoucherConfiguration());
+        modelBuilder.ApplyConfiguration(new PaymentVoucherConfiguration());
+        modelBuilder.ApplyConfiguration(new JournalVoucherConfiguration());
+        modelBuilder.ApplyConfiguration(new JournalVoucherItemConfiguration());
     }
 }

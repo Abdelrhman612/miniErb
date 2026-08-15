@@ -450,62 +450,62 @@ function SalesInvoiceDetailsModal({
 
     return (
         <Modal isOpen={!!invoice} onClose={onClose} title={`تفاصيل فاتورة المبيعات: ${invoice.invoiceNumber}`}>
-            <div className="space-y-6 max-h-[75vh] overflow-y-auto pr-1">
-                <div className="grid grid-cols-2 gap-4 bg-slate-950/60 p-4 rounded-xl border border-slate-800 text-sm">
+            <div className="print-container space-y-6 max-h-[75vh] overflow-y-auto pr-1">
+                <div className="grid grid-cols-2 gap-4 bg-slate-950/60 print:bg-white p-4 rounded-xl border border-slate-800 print:border-slate-300 text-sm">
                     <div>
-                        <span className="text-slate-400 block text-xs">رقم الفاتورة</span>
-                        <span className="font-bold text-slate-100">{invoice.invoiceNumber}</span>
+                        <span className="text-slate-400 print:text-slate-600 block text-xs">رقم الفاتورة</span>
+                        <span className="font-bold text-slate-100 print:text-slate-900">{invoice.invoiceNumber}</span>
                     </div>
                     <div>
-                        <span className="text-slate-400 block text-xs">الحالة</span>
+                        <span className="text-slate-400 print:text-slate-600 block text-xs">الحالة</span>
                         <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold mt-1 ${
                             invoice.status === PurchaseInvoiceStatus.Confirmed
-                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                ? 'bg-emerald-500/15 text-emerald-400 print:text-emerald-900 border border-emerald-500/20'
                                 : invoice.status === PurchaseInvoiceStatus.Cancelled
-                                ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                                : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                ? 'bg-rose-500/15 text-rose-400 print:text-rose-900 border border-rose-500/20'
+                                : 'bg-amber-500/15 text-amber-400 print:text-amber-900 border border-amber-500/20'
                         }`}>
                             {invoice.statusName}
                         </span>
                     </div>
                     <div>
-                        <span className="text-slate-400 block text-xs">العميل</span>
-                        <span className="font-semibold text-slate-200">{invoice.customerName}</span>
+                        <span className="text-slate-400 print:text-slate-600 block text-xs">العميل</span>
+                        <span className="font-semibold text-slate-200 print:text-slate-900">{invoice.customerName}</span>
                     </div>
                     <div>
-                        <span className="text-slate-400 block text-xs">المستودع</span>
-                        <span className="font-semibold text-slate-200">{invoice.warehouseName}</span>
+                        <span className="text-slate-400 print:text-slate-600 block text-xs">المستودع</span>
+                        <span className="font-semibold text-slate-200 print:text-slate-900">{invoice.warehouseName}</span>
                     </div>
                     <div>
-                        <span className="text-slate-400 block text-xs">تاريخ الفاتورة</span>
-                        <span className="text-slate-300">{new Date(invoice.invoiceDate).toLocaleDateString('ar-EG')}</span>
+                        <span className="text-slate-400 print:text-slate-600 block text-xs">تاريخ الفاتورة</span>
+                        <span className="text-slate-300 print:text-slate-900">{new Date(invoice.invoiceDate).toLocaleDateString('ar-EG')}</span>
                     </div>
                     <div>
-                        <span className="text-slate-400 block text-xs">طريقة الدفع</span>
-                        <span className="text-slate-300">{invoice.paymentTypeName}</span>
+                        <span className="text-slate-400 print:text-slate-600 block text-xs">طريقة الدفع</span>
+                        <span className="text-slate-300 print:text-slate-900">{invoice.paymentTypeName}</span>
                     </div>
                     <div>
-                        <span className="text-slate-400 block text-xs">إجمالي الفاتورة</span>
-                        <span className="font-bold text-emerald-400">{invoice.totalAmount.toFixed(2)} ج.م</span>
+                        <span className="text-slate-400 print:text-slate-600 block text-xs">إجمالي الفاتورة</span>
+                        <span className="font-bold text-emerald-400 print:text-emerald-900">{invoice.totalAmount.toFixed(2)} ج.م</span>
                     </div>
                     <div>
-                        <span className="text-slate-400 block text-xs">المبلغ المدفوع / المتبقي</span>
-                        <span className="font-bold text-blue-400">{invoice.paidAmount.toFixed(2)} ج.م</span>
-                        <span className="text-xs text-amber-400 block">المتبقي: {remaining.toFixed(2)} ج.م</span>
+                        <span className="text-slate-400 print:text-slate-600 block text-xs">المبلغ المدفوع / المتبقي</span>
+                        <span className="font-bold text-blue-400 print:text-blue-900">{invoice.paidAmount.toFixed(2)} ج.م</span>
+                        <span className="text-xs text-amber-400 print:text-amber-900 block">المتبقي: {remaining.toFixed(2)} ج.م</span>
                     </div>
                     {invoice.notes && (
                         <div className="col-span-2">
-                            <span className="text-slate-400 block text-xs">ملاحظات</span>
-                            <span className="text-slate-300">{invoice.notes}</span>
+                            <span className="text-slate-400 print:text-slate-600 block text-xs">ملاحظات</span>
+                            <span className="text-slate-300 print:text-slate-900">{invoice.notes}</span>
                         </div>
                     )}
                 </div>
 
                 <div>
-                    <h4 className="text-sm font-bold text-slate-200 mb-3">بنود الفاتورة</h4>
-                    <div className="overflow-x-auto rounded-xl border border-slate-800">
+                    <h4 className="text-sm font-bold text-slate-200 print:text-slate-900 mb-3">بنود الفاتورة</h4>
+                    <div className="overflow-x-auto rounded-xl border border-slate-800 print:border-slate-300">
                         <table className="w-full text-right text-xs">
-                            <thead className="bg-slate-950 text-slate-400 border-b border-slate-800">
+                            <thead className="bg-slate-950 print:bg-slate-200 text-slate-400 print:text-slate-900 border-b border-slate-800 print:border-slate-300">
                                 <tr>
                                     <th className="p-2.5">المنتج</th>
                                     <th className="p-2.5">الكمية</th>
@@ -513,13 +513,13 @@ function SalesInvoiceDetailsModal({
                                     <th className="p-2.5">الإجمالي</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-800/60">
+                            <tbody className="divide-y divide-slate-800/60 print:divide-slate-300 text-slate-300 print:text-slate-900">
                                 {invoice.items.map(item => (
                                     <tr key={item.id} className="hover:bg-slate-950/30">
-                                        <td className="p-2.5 text-slate-200">{item.productCode} - {item.productName}</td>
-                                        <td className="p-2.5 text-slate-300">{item.quantity}</td>
-                                        <td className="p-2.5 text-slate-300">{item.unitPrice.toFixed(2)}</td>
-                                        <td className="p-2.5 font-semibold text-emerald-400">{item.total.toFixed(2)}</td>
+                                        <td className="p-2.5 text-slate-200 print:text-slate-900">{item.productCode} - {item.productName}</td>
+                                        <td className="p-2.5 text-slate-300 print:text-slate-900">{item.quantity}</td>
+                                        <td className="p-2.5 text-slate-300 print:text-slate-900">{item.unitPrice.toFixed(2)}</td>
+                                        <td className="p-2.5 font-semibold text-emerald-400 print:text-emerald-900">{item.total.toFixed(2)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -527,11 +527,18 @@ function SalesInvoiceDetailsModal({
                     </div>
                 </div>
 
-                <div className="pt-2 flex justify-end">
+                <div className="pt-2 flex justify-between items-center">
+                    <button
+                        type="button"
+                        onClick={() => window.print()}
+                        className="px-5 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold text-sm hover:bg-emerald-500/30 transition-colors print:hidden"
+                    >
+                        طباعة الفاتورة
+                    </button>
                     <button
                         type="button"
                         onClick={onClose}
-                        className="px-5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-medium text-sm hover:bg-slate-700 transition-colors"
+                        className="px-5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-medium text-sm hover:bg-slate-700 transition-colors print:hidden"
                     >
                         إغلاق
                     </button>

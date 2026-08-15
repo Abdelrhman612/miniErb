@@ -10,4 +10,6 @@ public interface ICustomerService
     Task<CustomerResponseDto> UpdateAsync(int id, UpdateCustomerDto dto);
     Task DeleteAsync(int id);
     Task HardDeleteAsync(int id);
+    Task<CustomerAccountResponseDto> GetAccountAsync(int customerId);
+    Task<IEnumerable<AccountTransactionResponseDto>> GetAccountTransactionsAsync(int customerId, DateTime? fromDate, DateTime? toDate);
 }

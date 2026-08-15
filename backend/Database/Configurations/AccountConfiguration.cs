@@ -25,11 +25,29 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             .IsRequired()
             .HasMaxLength(50);
 
+        builder.Property(a => a.IsGroup)
+            .IsRequired();
+
         builder.Property(a => a.IsActive)
             .IsRequired();
 
         builder.Property(a => a.CreatedAt)
             .IsRequired();
+
+        builder.HasOne(a => a.ParentAccount)
+            .WithMany(a => a.Children)
+            .HasForeignKey(a => a.ParentAccountId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(a => a.Customer)
+            .WithOne()
+            .HasForeignKey<Account>(a => a.CustomerId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(a => a.Supplier)
+            .WithOne()
+            .HasForeignKey<Account>(a => a.SupplierId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.ToTable("Accounts");
     }

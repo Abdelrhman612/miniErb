@@ -36,6 +36,10 @@ builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IPurchaseInvoiceService, PurchaseInvoiceService>();
 builder.Services.AddScoped<ISalesInvoiceService, SalesInvoiceService>();
 builder.Services.AddScoped<ITreasuryService, TreasuryService>();
+builder.Services.AddScoped<IReceiptVoucherService, ReceiptVoucherService>();
+builder.Services.AddScoped<IPaymentVoucherService, PaymentVoucherService>();
+builder.Services.AddScoped<IJournalVoucherService, JournalVoucherService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 // ── MVC / OpenAPI ─────────────────────────────────────────────────────────────
 builder.Services.AddOpenApi();
@@ -56,6 +60,22 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// ── Seed Default Chart of Accounts on Startup ──────────────────────────────────
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var accountService = services.GetRequiredService<IAccountService>();
+        await accountService.SeedDefaultChartOfAccountsAsync();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the Chart of Accounts.");
+    }
+}
+
 // ── Middleware ────────────────────────────────────────────────────────────────
 // Global exception handler must be the first middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();
@@ -73,7 +93,3 @@ app.MapControllers();
 app.MapGet("/", () => "Sewing Parts ERP API is running.");
 
 app.Run();
-
-
-
-

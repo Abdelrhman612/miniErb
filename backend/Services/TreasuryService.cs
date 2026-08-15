@@ -64,6 +64,9 @@ public class TreasuryService : ITreasuryService
             initialTx = new AccountTransaction
             {
                 TransactionType = TransactionType.Credit,
+                Debit = 0,
+                Credit = dto.InitialBalance,
+                PaidAmount = 0,
                 Amount = dto.InitialBalance,
                 Description = "الرصيد الافتتاحي للخزنة",
                 ReferenceType = "InitialBalance",
@@ -79,8 +82,8 @@ public class TreasuryService : ITreasuryService
     public static decimal CalculateBalance(Account account)
     {
         if (account.Transactions == null) return 0;
-        var credits = account.Transactions.Where(t => t.TransactionType == TransactionType.Credit).Sum(t => t.Amount);
-        var debits = account.Transactions.Where(t => t.TransactionType == TransactionType.Debit).Sum(t => t.Amount);
+        var credits = account.Transactions.Sum(t => t.Credit > 0 ? t.Credit : (t.TransactionType == TransactionType.Credit ? t.Amount : 0));
+        var debits = account.Transactions.Sum(t => t.Debit > 0 ? t.Debit : (t.TransactionType == TransactionType.Debit ? t.Amount : 0));
         return credits - debits;
     }
 
@@ -108,6 +111,10 @@ public class TreasuryService : ITreasuryService
             _ => at.TransactionType.ToString()
         },
         Amount = at.Amount,
+        Debit = at.Debit > 0 ? at.Debit : (at.TransactionType == TransactionType.Debit ? at.Amount : 0),
+        Credit = at.Credit > 0 ? at.Credit : (at.TransactionType == TransactionType.Credit ? at.Amount : 0),
+        PaidAmount = at.PaidAmount,
+        PartyName = at.PartyName,
         Description = at.Description,
         ReferenceType = at.ReferenceType,
         ReferenceId = at.ReferenceId,

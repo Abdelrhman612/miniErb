@@ -299,15 +299,223 @@ export interface CreateTreasuryDto {
   initialBalance: number;
 }
 
+export interface AccountProductDetailDto {
+  productName: string;
+  productCode: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
 export interface AccountTransactionResponseDto {
   id: number;
   accountId: number;
   transactionType: TransactionType;
   transactionTypeName: string;
   amount: number;
+  debit: number;
+  credit: number;
+  paidAmount: number;
+  outstandingAmount: number;
   description?: string;
+  partyName?: string;
   referenceType?: string;
   referenceId?: number;
+  invoiceNumber?: string;
+  debtorName: string;
+  creditorName: string;
+  products: AccountProductDetailDto[];
+  runningBalance: number;
   transactionDate: string;
   createdAt: string;
+}
+
+export interface CustomerAccountResponseDto {
+  customerId: number;
+  customerName: string;
+  phone: string;
+  address?: string;
+  accountId: number;
+  code: string;
+  openingBalance: number;
+  balance: number;
+  totalSales: number;
+  totalPaid: number;
+  totalOutstanding: number;
+  isActive: boolean;
+}
+
+export interface SupplierAccountResponseDto {
+  supplierId: number;
+  supplierName: string;
+  phone: string;
+  address?: string;
+  accountId: number;
+  code: string;
+  openingBalance: number;
+  balance: number;
+  totalPurchases: number;
+  totalPaid: number;
+  totalOutstanding: number;
+  isActive: boolean;
+}
+
+export const VoucherStatus = {
+  Draft: 1,
+  Confirmed: 2,
+  Cancelled: 3,
+} as const;
+export type VoucherStatus = typeof VoucherStatus[keyof typeof VoucherStatus];
+
+export interface ReceiptVoucherResponseDto {
+  id: number;
+  voucherNumber: string;
+  voucherDate: string;
+  treasuryId: number;
+  treasuryName: string;
+  customerId?: number;
+  customerName?: string;
+  supplierId?: number;
+  supplierName?: string;
+  counterAccountId?: number;
+  counterAccountCode?: string;
+  counterAccountName?: string;
+  partyName?: string;
+  resolvedPartyName: string;
+  amount: number;
+  description?: string;
+  status: VoucherStatus;
+  statusName: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CreateReceiptVoucherDto {
+  voucherNumber?: string;
+  voucherDate: string;
+  treasuryId: number;
+  customerId?: number;
+  supplierId?: number;
+  counterAccountId?: number;
+  partyName?: string;
+  amount: number;
+  description?: string;
+}
+export interface UpdateReceiptVoucherDto extends CreateReceiptVoucherDto {}
+
+export interface PaymentVoucherResponseDto {
+  id: number;
+  voucherNumber: string;
+  voucherDate: string;
+  treasuryId: number;
+  treasuryName: string;
+  supplierId?: number;
+  supplierName?: string;
+  customerId?: number;
+  customerName?: string;
+  counterAccountId?: number;
+  counterAccountCode?: string;
+  counterAccountName?: string;
+  partyName?: string;
+  resolvedPartyName: string;
+  amount: number;
+  description?: string;
+  status: VoucherStatus;
+  statusName: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CreatePaymentVoucherDto {
+  voucherNumber?: string;
+  voucherDate: string;
+  treasuryId: number;
+  supplierId?: number;
+  customerId?: number;
+  counterAccountId?: number;
+  partyName?: string;
+  amount: number;
+  description?: string;
+}
+export interface UpdatePaymentVoucherDto extends CreatePaymentVoucherDto {}
+
+export interface JournalVoucherItemResponseDto {
+  id: number;
+  accountId: number;
+  accountCode: string;
+  accountName: string;
+  debit: number;
+  credit: number;
+  description?: string;
+}
+
+export interface CreateJournalVoucherItemDto {
+  accountId: number;
+  debit: number;
+  credit: number;
+  description?: string;
+}
+
+export interface JournalVoucherResponseDto {
+  id: number;
+  voucherNumber: string;
+  voucherDate: string;
+  description?: string;
+  status: VoucherStatus;
+  statusName: string;
+  totalDebit: number;
+  totalCredit: number;
+  createdAt: string;
+  updatedAt?: string;
+  items: JournalVoucherItemResponseDto[];
+}
+
+export interface CreateJournalVoucherDto {
+  voucherNumber?: string;
+  voucherDate: string;
+  description?: string;
+  items: CreateJournalVoucherItemDto[];
+}
+export interface UpdateJournalVoucherDto extends CreateJournalVoucherDto {}
+
+export interface Account {
+  id: number;
+  code: string;
+  name: string;
+  accountType: string;
+  parentAccountId?: number;
+  parentAccountName?: string;
+  isGroup: boolean;
+  isActive: boolean;
+  balance: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface AccountNode {
+  id: number;
+  code: string;
+  name: string;
+  accountType: string;
+  parentAccountId?: number;
+  isGroup: boolean;
+  isActive: boolean;
+  balance: number;
+  children: AccountNode[];
+}
+
+export interface CreateAccountDto {
+  code: string;
+  name: string;
+  accountType: string;
+  parentAccountId?: number;
+  isGroup: boolean;
+}
+
+export interface UpdateAccountDto {
+  name: string;
+  accountType: string;
+  parentAccountId?: number;
+  isGroup: boolean;
+  isActive: boolean;
 }

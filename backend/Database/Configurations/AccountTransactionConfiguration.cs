@@ -14,11 +14,26 @@ public class AccountTransactionConfiguration : IEntityTypeConfiguration<AccountT
             .IsRequired()
             .HasColumnType("decimal(18,2)");
 
+        builder.Property(at => at.Debit)
+            .IsRequired()
+            .HasColumnType("decimal(18,2)");
+
+        builder.Property(at => at.Credit)
+            .IsRequired()
+            .HasColumnType("decimal(18,2)");
+
+        builder.Property(at => at.PaidAmount)
+            .IsRequired()
+            .HasColumnType("decimal(18,2)");
+
         builder.Property(at => at.TransactionType)
             .IsRequired();
 
         builder.Property(at => at.Description)
             .HasMaxLength(500);
+
+        builder.Property(at => at.PartyName)
+            .HasMaxLength(150);
 
         builder.Property(at => at.ReferenceType)
             .HasMaxLength(50);

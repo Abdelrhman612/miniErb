@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import axios from 'axios';
 import { Alert } from '../components/ui/Alert';
 import { FormField, TextareaField } from '../components/ui/FormFields';
@@ -87,6 +88,7 @@ function CustomerForm({ initial, onSave, onCancel, saving }: CustomerFormProps) 
 }
 
 export function CustomersPage() {
+    const navigate = useNavigate();
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -190,7 +192,7 @@ export function CustomersPage() {
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h1 className="text-2xl font-black text-slate-100">العملاء</h1>
-                    <p className="text-slate-500 text-sm mt-1">إدارة بيانات العملاء والأرصدة الافتتاحية</p>
+                    <p className="text-slate-500 text-sm mt-1">إدارة بيانات العملاء والأرصدة الافتتاحية والحسابات</p>
                 </div>
                 <button onClick={openCreate} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 font-bold text-sm hover:opacity-90 transition-opacity shadow-lg shadow-emerald-500/20">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
@@ -213,9 +215,9 @@ export function CustomersPage() {
                             <p>{query ? 'لا توجد نتائج لهذا البحث.' : 'لا توجد عملاء بعد. أضف أول عميل الآن.'}</p>
                         </div>
                     ) : filtered.map((item) => (
-                        <div key={item.id} className="flex items-center justify-between p-5 bg-slate-900/60 border border-slate-800/60 rounded-2xl hover:border-slate-700 transition-colors">
+                        <div key={item.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 bg-slate-900/60 border border-slate-800/60 rounded-2xl hover:border-slate-700 transition-colors">
                             <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
                                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                                 </div>
                                 <div>
@@ -224,10 +226,16 @@ export function CustomersPage() {
                                     {item.address && <p className="text-sm text-slate-500">{item.address}</p>}
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 flex-wrap">
                                 <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${item.isActive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-700/40 text-slate-500 border-slate-700/40'}`}>
                                     {item.isActive ? 'نشط' : 'غير نشط'}
                                 </span>
+                                <button
+                                    onClick={() => navigate(`/customers/${item.id}/account`)}
+                                    className="px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold hover:bg-blue-500/20 transition-colors"
+                                >
+                                    كشف الحساب
+                                </button>
                                 <button onClick={() => openEdit(item)} className="p-2 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors" title="تعديل">
                                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                 </button>

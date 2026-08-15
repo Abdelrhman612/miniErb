@@ -29,6 +29,23 @@ public class SuppliersController : ControllerBase
         return Ok(supplier);
     }
 
+    [HttpGet("{id:int}/account")]
+    public async Task<ActionResult<SupplierAccountResponseDto>> GetAccount(int id)
+    {
+        var account = await _supplierService.GetAccountAsync(id);
+        return Ok(account);
+    }
+
+    [HttpGet("{id:int}/account/transactions")]
+    public async Task<ActionResult<IEnumerable<AccountTransactionResponseDto>>> GetAccountTransactions(
+        int id,
+        [FromQuery] DateTime? fromDate,
+        [FromQuery] DateTime? toDate)
+    {
+        var transactions = await _supplierService.GetAccountTransactionsAsync(id, fromDate, toDate);
+        return Ok(transactions);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateSupplierDto dto)
     {
