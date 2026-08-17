@@ -179,6 +179,46 @@ public class PurchaseInvoiceService : IPurchaseInvoiceService
                 _context.InventoryTransactions.Add(invTx);
             }
 
+            // 4. Create Inventory / Purchases Account Transaction
+            {
+                var inventoryAccount = await _context.Accounts
+                    .FirstOrDefaultAsync(a => a.Code == "1130" || a.Name.Contains("مخزون") || a.AccountType == "Asset");
+                if (inventoryAccount == null)
+                {
+                    var currentAssets = await _context.Accounts.FirstOrDefaultAsync(a => a.Code == "1100");
+                    inventoryAccount = new Account
+                    {
+                        Code = "1130",
+                        Name = "المخزون",
+                        AccountType = "Asset",
+                        ParentAccountId = currentAssets?.Id,
+                        IsGroup = false,
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    _context.Accounts.Add(inventoryAccount);
+                    await _context.SaveChangesAsync();
+                }
+
+                var supplier = await _context.Suppliers.FindAsync(invoice.SupplierId);
+                var invTxAcc = new AccountTransaction
+                {
+                    AccountId = inventoryAccount.Id,
+                    TransactionType = TransactionType.Debit,
+                    Debit = invoice.TotalAmount,
+                    Credit = 0,
+                    PaidAmount = invoice.PaidAmount,
+                    Amount = invoice.TotalAmount,
+                    PartyName = supplier?.Name ?? string.Empty,
+                    Description = $"فاتورة مشتريات رقم {invoice.InvoiceNumber}",
+                    ReferenceType = "PurchaseInvoice",
+                    ReferenceId = invoice.Id,
+                    TransactionDate = invoice.InvoiceDate,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.AccountTransactions.Add(invTxAcc);
+            }
+
             if (invoice.PaidAmount > 0)
             {
                 var treasury = await _context.Accounts
@@ -201,9 +241,9 @@ public class PurchaseInvoiceService : IPurchaseInvoiceService
                 var accountTx = new AccountTransaction
                 {
                     AccountId = treasury.Id,
-                    TransactionType = TransactionType.Debit,
-                    Debit = invoice.PaidAmount,
-                    Credit = 0,
+                    TransactionType = TransactionType.Credit,
+                    Debit = 0,
+                    Credit = invoice.PaidAmount,
                     PaidAmount = invoice.PaidAmount,
                     Amount = invoice.PaidAmount,
                     PartyName = supplier?.Name ?? string.Empty,
@@ -216,7 +256,8 @@ public class PurchaseInvoiceService : IPurchaseInvoiceService
                 _context.AccountTransactions.Add(accountTx);
             }
 
-            // Create Supplier Account Transaction for confirmed purchase invoice
+            // Create Supplier Account Transaction for confirmed purchase invoice if credit/partial (> 0 unpaid)
+            if (invoice.TotalAmount > invoice.PaidAmount)
             {
                 var supplierAccount = await _context.Accounts
                     .FirstOrDefaultAsync(a => a.SupplierId == invoice.SupplierId);
@@ -240,11 +281,11 @@ public class PurchaseInvoiceService : IPurchaseInvoiceService
                 {
                     AccountId = supplierAccount.Id,
                     TransactionType = TransactionType.Credit,
-                    Debit = invoice.PaidAmount,
-                    Credit = invoice.TotalAmount,
+                    Debit = 0,
+                    Credit = invoice.TotalAmount - invoice.PaidAmount,
                     PaidAmount = invoice.PaidAmount,
-                    Amount = Math.Abs(invoice.TotalAmount - invoice.PaidAmount),
-                    Description = $"فاتورة مشتريات رقم {invoice.InvoiceNumber}",
+                    Amount = invoice.TotalAmount - invoice.PaidAmount,
+                    Description = $"فاتورة مشتريات آجل رقم {invoice.InvoiceNumber}",
                     ReferenceType = "PurchaseInvoice",
                     ReferenceId = invoice.Id,
                     TransactionDate = invoice.InvoiceDate,
@@ -315,9 +356,9 @@ public class PurchaseInvoiceService : IPurchaseInvoiceService
                         var accountTx = new AccountTransaction
                         {
                             AccountId = treasury.Id,
-                            TransactionType = TransactionType.Credit,
-                            Debit = 0,
-                            Credit = invoice.PaidAmount,
+                            TransactionType = TransactionType.Debit,
+                            Debit = invoice.PaidAmount,
+                            Credit = 0,
                             PaidAmount = invoice.PaidAmount,
                             Amount = invoice.PaidAmount,
                             Description = $"استرداد مبلغ إلغاء فاتورة مشتريات رقم {invoice.InvoiceNumber}",
@@ -330,7 +371,32 @@ public class PurchaseInvoiceService : IPurchaseInvoiceService
                     }
                 }
 
-                // Reverse supplier account
+                // Reverse Inventory Account
+                {
+                    var inventoryAccount = await _context.Accounts
+                        .FirstOrDefaultAsync(a => a.Code == "1130" || a.Name.Contains("مخزون") || a.AccountType == "Asset");
+                    if (inventoryAccount != null)
+                    {
+                        var invReversalTx = new AccountTransaction
+                        {
+                            AccountId = inventoryAccount.Id,
+                            TransactionType = TransactionType.Credit,
+                            Debit = 0,
+                            Credit = invoice.TotalAmount,
+                            PaidAmount = invoice.PaidAmount,
+                            Amount = invoice.TotalAmount,
+                            Description = $"إلغاء فاتورة مشتريات رقم {invoice.InvoiceNumber}",
+                            ReferenceType = "PurchaseInvoiceCancellation",
+                            ReferenceId = invoice.Id,
+                            TransactionDate = DateTime.UtcNow,
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        _context.AccountTransactions.Add(invReversalTx);
+                    }
+                }
+
+                // Reverse supplier account if unpaid amount > 0
+                if (invoice.TotalAmount > invoice.PaidAmount)
                 {
                     var supplierAccount = await _context.Accounts
                         .FirstOrDefaultAsync(a => a.SupplierId == invoice.SupplierId);
@@ -340,10 +406,10 @@ public class PurchaseInvoiceService : IPurchaseInvoiceService
                         {
                             AccountId = supplierAccount.Id,
                             TransactionType = TransactionType.Debit,
-                            Debit = invoice.TotalAmount,
-                            Credit = invoice.PaidAmount,
+                            Debit = invoice.TotalAmount - invoice.PaidAmount,
+                            Credit = 0,
                             PaidAmount = invoice.PaidAmount,
-                            Amount = Math.Abs(invoice.TotalAmount - invoice.PaidAmount),
+                            Amount = invoice.TotalAmount - invoice.PaidAmount,
                             Description = $"إلغاء فاتورة مشتريات رقم {invoice.InvoiceNumber}",
                             ReferenceType = "PurchaseInvoiceCancellation",
                             ReferenceId = invoice.Id,

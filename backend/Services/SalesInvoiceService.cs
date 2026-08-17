@@ -205,9 +205,9 @@ public class SalesInvoiceService : ISalesInvoiceService
                 var accountTx = new AccountTransaction
                 {
                     AccountId = treasury.Id,
-                    TransactionType = TransactionType.Credit,
-                    Debit = 0,
-                    Credit = invoice.PaidAmount,
+                    TransactionType = TransactionType.Debit,
+                    Debit = invoice.PaidAmount,
+                    Credit = 0,
                     PaidAmount = invoice.PaidAmount,
                     Amount = invoice.PaidAmount,
                     PartyName = customer?.Name ?? string.Empty,
@@ -220,7 +220,48 @@ public class SalesInvoiceService : ISalesInvoiceService
                 _context.AccountTransactions.Add(accountTx);
             }
 
-            // 6. Create Customer Account Transaction for confirmed sales invoice
+            // 6. Create Sales Revenue Transaction
+            {
+                var salesAccount = await _context.Accounts
+                    .FirstOrDefaultAsync(a => a.Code == "4100" || a.AccountType == "Revenue");
+                if (salesAccount == null)
+                {
+                    var revenueRoot = await _context.Accounts.FirstOrDefaultAsync(a => a.Code == "4000");
+                    salesAccount = new Account
+                    {
+                        Code = "4100",
+                        Name = "المبيعات",
+                        AccountType = "Revenue",
+                        ParentAccountId = revenueRoot?.Id,
+                        IsGroup = false,
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    _context.Accounts.Add(salesAccount);
+                    await _context.SaveChangesAsync();
+                }
+
+                var customer = await _context.Customers.FindAsync(invoice.CustomerId);
+                var salesTx = new AccountTransaction
+                {
+                    AccountId = salesAccount.Id,
+                    TransactionType = TransactionType.Credit,
+                    Debit = 0,
+                    Credit = invoice.TotalAmount,
+                    PaidAmount = invoice.PaidAmount,
+                    Amount = invoice.TotalAmount,
+                    PartyName = customer?.Name ?? string.Empty,
+                    Description = $"فاتورة مبيعات رقم {invoice.InvoiceNumber}",
+                    ReferenceType = "SalesInvoice",
+                    ReferenceId = invoice.Id,
+                    TransactionDate = invoice.InvoiceDate,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.AccountTransactions.Add(salesTx);
+            }
+
+            // 7. Create Customer Account Transaction if unpaid amount > 0
+            if (invoice.TotalAmount > invoice.PaidAmount)
             {
                 var customerAccount = await _context.Accounts
                     .FirstOrDefaultAsync(a => a.CustomerId == invoice.CustomerId);
@@ -243,12 +284,12 @@ public class SalesInvoiceService : ISalesInvoiceService
                 var custTx = new AccountTransaction
                 {
                     AccountId = customerAccount.Id,
-                    TransactionType = invoice.TotalAmount >= invoice.PaidAmount ? TransactionType.Debit : TransactionType.Credit,
-                    Debit = invoice.TotalAmount,
-                    Credit = invoice.PaidAmount,
+                    TransactionType = TransactionType.Debit,
+                    Debit = invoice.TotalAmount - invoice.PaidAmount,
+                    Credit = 0,
                     PaidAmount = invoice.PaidAmount,
-                    Amount = Math.Abs(invoice.TotalAmount - invoice.PaidAmount),
-                    Description = $"فاتورة مبيعات رقم {invoice.InvoiceNumber}",
+                    Amount = invoice.TotalAmount - invoice.PaidAmount,
+                    Description = $"فاتورة مبيعات آجل رقم {invoice.InvoiceNumber}",
                     ReferenceType = "SalesInvoice",
                     ReferenceId = invoice.Id,
                     TransactionDate = invoice.InvoiceDate,
@@ -332,9 +373,9 @@ public class SalesInvoiceService : ISalesInvoiceService
                         var accountTx = new AccountTransaction
                         {
                             AccountId = treasury.Id,
-                            TransactionType = TransactionType.Debit,
-                            Debit = invoice.PaidAmount,
-                            Credit = 0,
+                            TransactionType = TransactionType.Credit,
+                            Debit = 0,
+                            Credit = invoice.PaidAmount,
                             PaidAmount = invoice.PaidAmount,
                             Amount = invoice.PaidAmount,
                             Description = $"رد مبلغ إلغاء فاتورة مبيعات رقم {invoice.InvoiceNumber}",
@@ -347,7 +388,32 @@ public class SalesInvoiceService : ISalesInvoiceService
                     }
                 }
 
-                // Reverse customer account
+                // Reverse Sales Revenue
+                {
+                    var salesAccount = await _context.Accounts
+                        .FirstOrDefaultAsync(a => a.Code == "4100" || a.AccountType == "Revenue");
+                    if (salesAccount != null)
+                    {
+                        var salesReversalTx = new AccountTransaction
+                        {
+                            AccountId = salesAccount.Id,
+                            TransactionType = TransactionType.Debit,
+                            Debit = invoice.TotalAmount,
+                            Credit = 0,
+                            PaidAmount = invoice.PaidAmount,
+                            Amount = invoice.TotalAmount,
+                            Description = $"إلغاء فاتورة مبيعات رقم {invoice.InvoiceNumber}",
+                            ReferenceType = "SalesInvoiceCancellation",
+                            ReferenceId = invoice.Id,
+                            TransactionDate = DateTime.UtcNow,
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        _context.AccountTransactions.Add(salesReversalTx);
+                    }
+                }
+
+                // Reverse customer account if unpaid amount > 0
+                if (invoice.TotalAmount > invoice.PaidAmount)
                 {
                     var customerAccount = await _context.Accounts
                         .FirstOrDefaultAsync(a => a.CustomerId == invoice.CustomerId);
@@ -357,10 +423,10 @@ public class SalesInvoiceService : ISalesInvoiceService
                         {
                             AccountId = customerAccount.Id,
                             TransactionType = TransactionType.Credit,
-                            Debit = invoice.PaidAmount,
-                            Credit = invoice.TotalAmount,
+                            Debit = 0,
+                            Credit = invoice.TotalAmount - invoice.PaidAmount,
                             PaidAmount = invoice.PaidAmount,
-                            Amount = Math.Abs(invoice.TotalAmount - invoice.PaidAmount),
+                            Amount = invoice.TotalAmount - invoice.PaidAmount,
                             Description = $"إلغاء فاتورة مبيعات رقم {invoice.InvoiceNumber}",
                             ReferenceType = "SalesInvoiceCancellation",
                             ReferenceId = invoice.Id,

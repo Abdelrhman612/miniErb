@@ -15,6 +15,7 @@ import { ReceiptVouchersPage } from './pages/ReceiptVouchersPage';
 import { PaymentVouchersPage } from './pages/PaymentVouchersPage';
 import { JournalVouchersPage } from './pages/JournalVouchersPage';
 import { ChartOfAccountsPage } from './pages/ChartOfAccountsPage';
+import { DashboardPage } from './pages/DashboardPage';
 import './index.css';
 
 function App() {
@@ -22,7 +23,8 @@ function App() {
     <BrowserRouter>
       <MainLayout>
         <Routes>
-          <Route path="/" element={<Navigate to="/products" replace />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/warehouses" element={<WarehousesPage />} />

@@ -63,9 +63,9 @@ public class TreasuryService : ITreasuryService
         {
             initialTx = new AccountTransaction
             {
-                TransactionType = TransactionType.Credit,
-                Debit = 0,
-                Credit = dto.InitialBalance,
+                TransactionType = TransactionType.Debit,
+                Debit = dto.InitialBalance,
+                Credit = 0,
                 PaidAmount = 0,
                 Amount = dto.InitialBalance,
                 Description = "الرصيد الافتتاحي للخزنة",
@@ -82,9 +82,9 @@ public class TreasuryService : ITreasuryService
     public static decimal CalculateBalance(Account account)
     {
         if (account.Transactions == null) return 0;
-        var credits = account.Transactions.Sum(t => t.Credit > 0 ? t.Credit : (t.TransactionType == TransactionType.Credit ? t.Amount : 0));
         var debits = account.Transactions.Sum(t => t.Debit > 0 ? t.Debit : (t.TransactionType == TransactionType.Debit ? t.Amount : 0));
-        return credits - debits;
+        var credits = account.Transactions.Sum(t => t.Credit > 0 ? t.Credit : (t.TransactionType == TransactionType.Credit ? t.Amount : 0));
+        return debits - credits;
     }
 
     private static TreasuryResponseDto MapToResponse(Account a) => new()

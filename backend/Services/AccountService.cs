@@ -213,6 +213,8 @@ public class AccountService : IAccountService
             .ThenBy(at => at.Id)
             .ToListAsync();
 
+        bool isCreditNormal = account.AccountType == "Liability" || account.AccountType == "Equity" || account.AccountType == "Revenue" || account.AccountType == "Supplier";
+
         decimal runningBalance = 0;
         if (fromDate.HasValue)
         {
@@ -224,7 +226,7 @@ public class AccountService : IAccountService
             {
                 var d = tx.Debit > 0 ? tx.Debit : (tx.TransactionType == TransactionType.Debit ? tx.Amount : 0);
                 var c = tx.Credit > 0 ? tx.Credit : (tx.TransactionType == TransactionType.Credit ? tx.Amount : 0);
-                runningBalance += (d - c);
+                runningBalance += isCreditNormal ? (c - d) : (d - c);
             }
         }
 
@@ -233,7 +235,7 @@ public class AccountService : IAccountService
         {
             var d = tx.Debit > 0 ? tx.Debit : (tx.TransactionType == TransactionType.Debit ? tx.Amount : 0);
             var c = tx.Credit > 0 ? tx.Credit : (tx.TransactionType == TransactionType.Credit ? tx.Amount : 0);
-            runningBalance += (d - c);
+            runningBalance += isCreditNormal ? (c - d) : (d - c);
 
             result.Add(new AccountTransactionResponseDto
             {
