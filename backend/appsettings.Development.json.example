@@ -6,6 +6,6 @@
     }
   },
   "ConnectionStrings": {
-   "DefaultConnection": "Server=localhost,1433;Database=MiniERP;User Id=sa;Password=;TrustServerCertificate=True;"
- }
+    "DefaultConnection": "Server=localhost,1433;Database=MiniERP;User Id=sa;Password=YOUR_SECURE_PASSWORD;TrustServerCertificate=True;"
+  }
 }
