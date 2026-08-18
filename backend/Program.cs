@@ -148,6 +148,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-app.MapGet("/", () => "Sewing Parts ERP API is running.");
+app.MapGet("/", () => "MiniERP API is running.");
 
 app.Run();

@@ -103,24 +103,24 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="w-68 shrink-0 bg-slate-950 border-l border-slate-800/60 flex flex-col min-h-screen">
+    <aside className="w-72 shrink-0 bg-[#09090B] border-l border-zinc-800/80 flex flex-col min-h-screen">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-800/60">
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-blue-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 shrink-0">
-          <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <div className="flex items-center gap-3 px-6 py-5 border-b border-zinc-800/80 bg-[#121216]/50">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/10 shrink-0 border border-emerald-500/20">
+          <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         </div>
         <div>
-          <p className="font-extrabold text-sm text-slate-100 tracking-wide">Sewing Parts ERP</p>
-          <p className="text-[11px] text-emerald-400 font-medium">نظام الإدارة المتكامل</p>
+          <p className="font-bold text-sm text-zinc-100 tracking-wide">MiniERP</p>
+          <p className="text-[10px] text-emerald-400 font-medium uppercase tracking-wider">Enterprise Edition</p>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-2 overflow-y-auto">
-        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 mb-2">القوائم والأقسام</p>
+      <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
+        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-3 mb-2">القوائم الرئيسية</p>
         
         {navSections.map((section) => {
           if (section.to) {
@@ -129,14 +129,14 @@ export function Sidebar() {
                 key={section.to}
                 to={section.to}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 ${
                     isActive
-                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm'
-                      : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
+                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm font-semibold'
+                      : 'text-zinc-400 hover:text-zinc-100 hover:bg-[#121216]'
                   }`
                 }
               >
-                <span className="text-slate-400">{section.icon}</span>
+                <span className="text-zinc-400">{section.icon}</span>
                 {section.title}
               </NavLink>
             );
@@ -148,14 +148,14 @@ export function Sidebar() {
             <div key={section.title} className="space-y-1">
               <button
                 onClick={() => toggleSection(section.title)}
-                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-slate-100 hover:bg-slate-800/60 transition-colors"
+                className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-zinc-300 hover:text-zinc-100 hover:bg-[#121216] transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-slate-400">{section.icon}</span>
+                  <span className="text-zinc-400">{section.icon}</span>
                   <span>{section.title}</span>
                 </div>
                 <svg
-                  className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                  className={`w-3.5 h-3.5 text-zinc-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -166,20 +166,20 @@ export function Sidebar() {
               </button>
 
               {isOpen && section.items && (
-                <div className="pr-4 pl-1 space-y-1 py-1 border-r border-slate-800/80 mr-3">
+                <div className="pr-4 pl-1 space-y-1 py-1 border-r border-zinc-800/80 mr-3.5">
                   {section.items.map((subItem) => (
                     <NavLink
                       key={subItem.to}
                       to={subItem.to}
                       className={({ isActive }) =>
-                        `flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${
+                        `flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition-all duration-200 ${
                           isActive
-                            ? 'bg-emerald-500/10 text-emerald-400 font-semibold'
-                            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                            ? 'bg-emerald-500/10 text-emerald-400 font-semibold border-r-2 border-emerald-500'
+                            : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#121216]/60'
                         }`
                       }
                     >
-                      <span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-zinc-600"></span>
                       {subItem.label}
                     </NavLink>
                   ))}
@@ -191,14 +191,15 @@ export function Sidebar() {
 
         {/* System Admin section */}
         {user?.role === 'Admin' && (
-          <div className="pt-2 border-t border-slate-800/60 mt-2">
+          <div className="pt-3 border-t border-zinc-800/80 mt-3">
+            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-3 mb-2">الإدارة والنظام</p>
             <NavLink
               to="/users"
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 ${
                   isActive
-                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                    : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
+                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold'
+                    : 'text-zinc-400 hover:text-zinc-100 hover:bg-[#121216]'
                 }`
               }
             >
@@ -212,13 +213,13 @@ export function Sidebar() {
       </nav>
 
       {/* Footer / User Profile */}
-      <div className="px-4 py-4 border-t border-slate-800/60 space-y-3 bg-slate-950/80">
+      <div className="px-4 py-4 border-t border-zinc-800/80 space-y-3 bg-[#121216]/80">
         {user && (
-          <div className="flex items-center justify-between px-2 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+          <div className="flex items-center justify-between px-3 bg-[#09090B] p-2.5 rounded-xl border border-zinc-800">
             <div className="truncate">
-              <p className="text-xs font-bold text-slate-200 truncate">{user.displayName}</p>
+              <p className="text-xs font-bold text-zinc-200 truncate">{user.displayName}</p>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="text-[10px] text-slate-500 truncate">@{user.username}</span>
+                <span className="text-[10px] text-zinc-400 font-mono truncate">@{user.username}</span>
                 <span className={`text-[9px] px-1.5 py-0.5 rounded font-semibold ${
                   user.role === 'Admin' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
                 }`}>
@@ -229,7 +230,7 @@ export function Sidebar() {
             <button
               onClick={logout}
               title="تسجيل الخروج"
-              className="p-2 rounded-xl bg-slate-800 hover:bg-red-500/20 hover:text-red-400 text-slate-400 transition-colors"
+              className="p-2 rounded-xl bg-zinc-900 hover:bg-rose-500/20 hover:text-rose-400 text-zinc-400 border border-zinc-800 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -237,7 +238,7 @@ export function Sidebar() {
             </button>
           </div>
         )}
-        <p className="text-[10px] text-slate-600 text-center font-medium">ERP v1.0.0 — Professional Edition</p>
+        <p className="text-[10px] text-zinc-500 text-center font-medium">Enterprise ERP v1.0 • Secure</p>
       </div>
     </aside>
   );
