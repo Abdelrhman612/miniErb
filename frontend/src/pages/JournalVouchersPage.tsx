@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Alert } from '../components/ui/Alert';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { Modal } from '../components/ui/Modal';
+import { SearchableSelect } from '../components/ui/SearchableSelect';
 import { journalVoucherService, treasuryService, customerService, supplierService, accountService } from '../services/api';
 import type { JournalVoucherResponseDto, CreateJournalVoucherDto, UpdateJournalVoucherDto, CreateJournalVoucherItemDto, TreasuryResponseDto, Customer, Supplier, Account } from '../types';
 import { VoucherStatus } from '../types';
@@ -128,17 +129,17 @@ function JournalForm({ initial, accounts, onSave, onCancel, saving }: JournalFor
                     {items.map((item, index) => (
                         <div key={index} className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center bg-slate-950 p-3 rounded-xl border border-slate-800">
                             <div className="md:col-span-5">
-                                <label className="block text-[10px] text-slate-400 mb-0.5">الحساب من دليل الحسابات</label>
-                                <select
+                                <SearchableSelect
+                                    label="الحساب"
                                     value={item.accountId}
-                                    onChange={(e) => handleItemChange(index, 'accountId', Number(e.target.value))}
-                                    className="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-100 text-xs"
-                                >
-                                    <option value={0}>اختر الحساب</option>
-                                    {transactionAccounts.map(a => (
-                                        <option key={a.id} value={a.id}>{a.code} - {a.name} ({a.accountType})</option>
-                                    ))}
-                                </select>
+                                    onChange={(val) => handleItemChange(index, 'accountId', Number(val))}
+                                    options={transactionAccounts.map(a => ({
+                                        value: a.id,
+                                        label: `${a.code} - ${a.name}`,
+                                        subLabel: a.accountType
+                                    }))}
+                                    placeholder="اختر الحساب..."
+                                />
                             </div>
                             <div className="md:col-span-3">
                                 <label className="block text-[10px] text-emerald-400 mb-0.5">مدين (Debit)</label>

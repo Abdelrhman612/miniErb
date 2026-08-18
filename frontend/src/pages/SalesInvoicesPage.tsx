@@ -300,19 +300,18 @@ function SalesInvoiceForm({
 
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end bg-slate-950/60 p-4 rounded-xl border border-slate-800 mb-4">
                     <div className="md:col-span-5">
-                        <label className="block text-xs font-semibold text-slate-400 mb-1">المنتج</label>
-                        <select
+                        <SearchableSelect
+                            label="المنتج"
                             value={selectedProductId}
-                            onChange={e => setSelectedProductId(Number(e.target.value))}
-                            className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-100 text-sm"
-                        >
-                            <option value={0}>اختر المنتج</option>
-                            {activeProducts.map(p => (
-                                <option key={p.id} value={p.id}>
-                                    {p.code} - {p.name} (سعر البيع: {p.sellingPrice})
-                                </option>
-                            ))}
-                        </select>
+                            onChange={(val) => setSelectedProductId(Number(val))}
+                            options={activeProducts.map(p => ({
+                                value: p.id,
+                                label: `${p.code} - ${p.name}`,
+                                subLabel: `سعر: ${p.sellingPrice} ج.م`
+                            }))}
+                            placeholder="اختر أو ابحث عن منتج..."
+                            disabled={saving}
+                        />
                     </div>
 
                     <div className="md:col-span-2">

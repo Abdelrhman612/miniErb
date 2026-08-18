@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Alert } from '../components/ui/Alert';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { Modal } from '../components/ui/Modal';
+import { SearchableSelect } from '../components/ui/SearchableSelect';
 import {
     purchaseInvoiceService,
     supplierService,
@@ -178,37 +179,35 @@ function PurchaseInvoiceForm({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5">المورد *</label>
-                    <select
+                    <SearchableSelect
+                        label="المورد"
+                        required
                         value={supplierId}
-                        onChange={e => setSupplierId(Number(e.target.value))}
+                        onChange={(val) => setSupplierId(Number(val))}
+                        options={suppliers.map(s => ({
+                            value: s.id,
+                            label: s.name,
+                            subLabel: s.phone
+                        }))}
+                        placeholder="اختر أو ابحث عن المورد..."
                         disabled={saving}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                    >
-                        <option value={0}>اختر المورد</option>
-                        {suppliers.map(s => (
-                            <option key={s.id} value={s.id}>
-                                {s.name} ({s.phone})
-                            </option>
-                        ))}
-                    </select>
+                    />
                 </div>
 
                 <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5">المستودع *</label>
-                    <select
+                    <SearchableSelect
+                        label="المستودع"
+                        required
                         value={warehouseId}
-                        onChange={e => setWarehouseId(Number(e.target.value))}
+                        onChange={(val) => setWarehouseId(Number(val))}
+                        options={warehouses.map(w => ({
+                            value: w.id,
+                            label: w.name,
+                            subLabel: w.code
+                        }))}
+                        placeholder="اختر أو ابحث عن المستودع..."
                         disabled={saving}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                    >
-                        <option value={0}>اختر المستودع</option>
-                        {warehouses.map(w => (
-                            <option key={w.id} value={w.id}>
-                                {w.name} ({w.code})
-                            </option>
-                        ))}
-                    </select>
+                    />
                 </div>
 
                 <div>
@@ -268,19 +267,18 @@ function PurchaseInvoiceForm({
 
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end bg-slate-950/60 p-4 rounded-xl border border-slate-800 mb-4">
                     <div className="md:col-span-5">
-                        <label className="block text-xs font-semibold text-slate-400 mb-1">المنتج</label>
-                        <select
+                        <SearchableSelect
+                            label="المنتج"
                             value={selectedProductId}
-                            onChange={e => setSelectedProductId(Number(e.target.value))}
-                            className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-100 text-sm"
-                        >
-                            <option value={0}>اختر المنتج</option>
-                            {products.map(p => (
-                                <option key={p.id} value={p.id}>
-                                    {p.code} - {p.name} (شراء: {p.purchasePrice})
-                                </option>
-                            ))}
-                        </select>
+                            onChange={(val) => setSelectedProductId(Number(val))}
+                            options={products.map(p => ({
+                                value: p.id,
+                                label: `${p.code} - ${p.name}`,
+                                subLabel: `شراء: ${p.purchasePrice} ج.م`
+                            }))}
+                            placeholder="اختر أو ابحث عن منتج..."
+                            disabled={saving}
+                        />
                     </div>
 
                     <div className="md:col-span-2">
