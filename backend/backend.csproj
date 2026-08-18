@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>backend</RootNamespace>
     <AssemblyName>backend</AssemblyName>
+    <UserSecretsId>mini-erp-backend-secrets</UserSecretsId>
   </PropertyGroup>
 
 
