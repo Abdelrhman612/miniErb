@@ -5,6 +5,8 @@ import { Modal } from '../components/ui/Modal';
 import { Alert } from '../components/ui/Alert';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { FormField, TextareaField, SelectField } from '../components/ui/FormFields';
+import { useToast } from '../components/ui/Toast';
+import { EmptyState } from '../components/ui/EmptyState';
 import axios from 'axios';
 
 // ── Product Form ───────────────────────────────────────────────────────────────
@@ -111,6 +113,7 @@ function ProductForm({ initial, categories, onSave, onCancel, saving }: ProductF
 
 // ── Products Page ──────────────────────────────────────────────────────────────
 export function ProductsPage() {
+  const { showToast } = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -124,6 +127,7 @@ export function ProductsPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<Product | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
 
   const loadAll = async () => {
     try {
@@ -151,16 +155,21 @@ export function ProductsPage() {
     try {
       if (editTarget) {
         await productService.update(editTarget.id, dto as UpdateProductDto);
+        showToast('تم تحديث المنتج بنجاح', 'success');
       } else {
         await productService.create(dto as CreateProductDto);
+        showToast('تم إضافة المنتج بنجاح', 'success');
       }
       closeModal();
       await loadAll();
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        setSaveError(err.response?.data?.message ?? 'فشل في الحفظ');
+        const msg = err.response?.data?.message ?? 'فشل في الحفظ';
+        setSaveError(msg);
+        showToast(msg, 'error');
       } else {
         setSaveError('فشل في الحفظ');
+        showToast('فشل في الحفظ', 'error');
       }
     } finally {
       setSaving(false);
@@ -172,13 +181,17 @@ export function ProductsPage() {
     setDeactivateLoading(true);
     try {
       await productService.deactivate(deactivateConfirm.id);
+      showToast('تم إلغاء تفعيل المنتج بنجاح', 'success');
       setDeactivateConfirm(null);
       await loadAll();
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message ?? 'فشل في إلغاء التفعيل');
+        const msg = err.response?.data?.message ?? 'فشل في إلغاء التفعيل';
+        setError(msg);
+        showToast(msg, 'error');
       } else {
         setError('فشل في إلغاء التفعيل');
+        showToast('فشل في إلغاء التفعيل', 'error');
       }
       setDeactivateConfirm(null);
     } finally {
@@ -191,13 +204,17 @@ export function ProductsPage() {
     setDeleteLoading(true);
     try {
       await productService.delete(deleteConfirm.id);
+      showToast('تم حذف المنتج نهائياً', 'success');
       setDeleteConfirm(null);
       await loadAll();
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message ?? 'فشل في الحذف');
+        const msg = err.response?.data?.message ?? 'فشل في الحذف';
+        setError(msg);
+        showToast(msg, 'error');
       } else {
         setError('فشل في الحذف');
+        showToast('فشل في الحذف', 'error');
       }
       setDeleteConfirm(null);
     } finally {
@@ -205,19 +222,24 @@ export function ProductsPage() {
     }
   };
 
-  const filtered = products.filter((p) =>
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.categoryName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filtered = products.filter((p) => {
+    const matchesSearch =
+      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.categoryName.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    if (statusFilter === 'active') return matchesSearch && p.isActive;
+    if (statusFilter === 'inactive') return matchesSearch && !p.isActive;
+    return matchesSearch;
+  });
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto space-y-6" dir="rtl">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black text-slate-100">المنتجات</h1>
-          <p className="text-slate-500 text-sm mt-1">إدارة قطع غيار ماكينات الخياطة</p>
+          <h1 className="text-2xl font-black text-slate-100">إدارة المنتجات</h1>
+          <p className="text-slate-400 text-sm mt-1">كتالوج قطع غيار ماكينات الخياطة وأسعارها</p>
         </div>
         <button
           onClick={openCreate}
@@ -230,118 +252,154 @@ export function ProductsPage() {
         </button>
       </div>
 
-      {/* Search */}
-      <div className="relative mb-6">
-        <svg className="absolute top-1/2 -translate-y-1/2 end-4 w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="بحث بالاسم أو الكود أو الفئة..."
-          className="w-full pe-11 ps-4 py-3 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-transparent transition-all"
-        />
+      {error && <Alert type="error" message={error} />}
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[
+          { label: 'إجمالي المنتجات', value: products.length, color: 'text-slate-100', border: 'border-slate-800' },
+          { label: 'المنتجات النشطة', value: products.filter(p => p.isActive).length, color: 'text-emerald-400', border: 'border-emerald-500/20' },
+          { label: 'المنتجات غير النشطة', value: products.filter(p => !p.isActive).length, color: 'text-rose-400', border: 'border-rose-500/20' },
+        ].map((stat) => (
+          <div key={stat.label} className={`bg-slate-900/60 border ${stat.border} rounded-2xl p-5 shadow-lg`}>
+            <p className={`text-2xl font-black ${stat.color}`}>{stat.value}</p>
+            <p className="text-xs text-slate-400 mt-1 font-medium">{stat.label}</p>
+          </div>
+        ))}
       </div>
 
-      {error && <div className="mb-4"><Alert type="error" message={error} /></div>}
+      {/* Search & Filter Toolbar */}
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-slate-900/80 border border-slate-800 p-4 rounded-2xl shadow-xl">
+        <div className="relative flex-1 w-full">
+          <svg className="absolute top-1/2 -translate-y-1/2 end-4 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="بحث بالاسم أو الكود أو الفئة..."
+            className="w-full pe-11 ps-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+          />
+        </div>
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <button
+            onClick={() => setStatusFilter('all')}
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors ${statusFilter === 'all' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-400 hover:text-slate-200'}`}
+          >
+            الكل ({products.length})
+          </button>
+          <button
+            onClick={() => setStatusFilter('active')}
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors ${statusFilter === 'active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-400 hover:text-slate-200'}`}
+          >
+            النشطة ({products.filter(p => p.isActive).length})
+          </button>
+          <button
+            onClick={() => setStatusFilter('inactive')}
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors ${statusFilter === 'inactive' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-400 hover:text-slate-200'}`}
+          >
+            غير النشطة ({products.filter(p => !p.isActive).length})
+          </button>
+        </div>
+      </div>
 
       {loading ? (
-        <LoadingSpinner />
+        <div className="py-24 flex justify-center"><LoadingSpinner /></div>
       ) : (
         <>
-          {/* Stats Row */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            {[
-              { label: 'إجمالي المنتجات', value: products.length, color: 'text-slate-100' },
-              { label: 'المنتجات النشطة', value: products.filter(p => p.isActive).length, color: 'text-emerald-400' },
-              { label: 'المنتجات الغير نشطة', value: products.filter(p => !p.isActive).length, color: 'text-rose-400' },
-            ].map((stat) => (
-              <div key={stat.label} className="bg-slate-900/60 border border-slate-800/60 rounded-2xl p-4">
-                <p className={`text-2xl font-black ${stat.color}`}>{stat.value}</p>
-                <p className="text-xs text-slate-500 mt-1">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Table */}
           {filtered.length === 0 ? (
-            <div className="text-center py-16 text-slate-500">
-              <svg className="w-12 h-12 mx-auto mb-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
-              <p>{searchTerm ? 'لا توجد نتائج مطابقة للبحث.' : 'لا توجد منتجات بعد. أضف أول منتج الآن.'}</p>
-            </div>
+            <EmptyState
+              title={searchTerm || statusFilter !== 'all' ? 'لا توجد نتائج مطابقة' : 'لا توجد منتجات مسجلة'}
+              description={searchTerm || statusFilter !== 'all' ? 'جرب تغيير شروط البحث أو تصتيف الحالة للوصول إلى النتيجة المطلوبة.' : 'ابدأ بإضافة أول منتج إلى النظام لتبدأ في إدارة المخزون والمبيعات.'}
+              actionLabel={!searchTerm && statusFilter === 'all' ? '+ إضافة منتج جديد' : undefined}
+              onAction={!searchTerm && statusFilter === 'all' ? openCreate : undefined}
+            />
           ) : (
-            <div className="bg-slate-900/40 border border-slate-800/60 rounded-2xl overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-slate-800 bg-slate-900/60">
-                    <th className="text-right px-5 py-3.5 text-slate-400 font-semibold">الكود</th>
-                    <th className="text-right px-5 py-3.5 text-slate-400 font-semibold">الاسم</th>
-                    <th className="text-right px-5 py-3.5 text-slate-400 font-semibold">الفئة</th>
-                    <th className="text-right px-5 py-3.5 text-slate-400 font-semibold">سعر البيع</th>
-                    <th className="text-right px-5 py-3.5 text-slate-400 font-semibold">الوحدة</th>
-                    <th className="text-right px-5 py-3.5 text-slate-400 font-semibold">الحالة</th>
-                    <th className="text-right px-5 py-3.5 text-slate-400 font-semibold">إجراءات</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800/60">
-                  {filtered.map((product) => (
-                    <tr key={product.id} className="hover:bg-slate-800/30 transition-colors">
-                      <td className="px-5 py-4">
-                        <span className="font-mono text-xs bg-slate-800 border border-slate-700 px-2 py-1 rounded-lg text-slate-300">
-                          {product.code}
-                        </span>
-                      </td>
-                      <td className="px-5 py-4">
-                        <p className="font-medium text-slate-100">{product.name}</p>
-                        {product.barcode && <p className="text-xs text-slate-600 mt-0.5">{product.barcode}</p>}
-                      </td>
-                      <td className="px-5 py-4">
-                        <span className="px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs">
-                          {product.categoryName}
-                        </span>
-                      </td>
-                      <td className="px-5 py-4 font-semibold text-slate-100">
-                        {product.sellingPrice.toLocaleString('ar-EG', { minimumFractionDigits: 2 })} ج.م
-                      </td>
-                      <td className="px-5 py-4 text-slate-400">{product.unit}</td>
-                      <td className="px-5 py-4">
-                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${product.isActive
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                            : 'bg-slate-700/40 text-slate-500 border-slate-700/40'
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+              <div className="overflow-x-auto">
+                <table className="w-full text-right text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-800 bg-slate-950/50 text-slate-400 font-semibold">
+                      <th className="px-6 py-4">الكود</th>
+                      <th className="px-6 py-4">اسم المنتج</th>
+                      <th className="px-6 py-4">الفئة</th>
+                      <th className="px-6 py-4">سعر البيع</th>
+                      <th className="px-6 py-4">الوحدة</th>
+                      <th className="px-6 py-4">الحالة</th>
+                      <th className="px-6 py-4 text-center">الإجراءات</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/80">
+                    {filtered.map((product) => (
+                      <tr key={product.id} className="hover:bg-slate-800/40 transition-colors">
+                        <td className="px-6 py-4">
+                          <span className="font-mono text-xs bg-slate-950 border border-slate-800 px-2.5 py-1 rounded-lg text-slate-300">
+                            {product.code}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="font-semibold text-slate-100">{product.name}</p>
+                          {product.barcode && <p className="text-xs text-slate-500 mt-0.5">باركود: {product.barcode}</p>}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium">
+                            {product.categoryName}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 font-bold text-slate-100">
+                          {product.sellingPrice.toLocaleString('ar-EG', { minimumFractionDigits: 2 })} <span className="text-xs text-slate-400 font-normal">ج.م</span>
+                        </td>
+                        <td className="px-6 py-4 text-slate-400 text-xs font-medium">{product.unit}</td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${
+                            product.isActive
+                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                              : 'bg-slate-800 text-slate-400 border-slate-700'
                           }`}>
-                          {product.isActive ? 'نشط' : 'غير نشط'}
-                        </span>
-                      </td>
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-1">
-                          <button onClick={() => openEdit(product)} className="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors" title="تعديل">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
-                          {product.isActive && (
-                            <button onClick={() => setDeactivateConfirm(product)} className="p-1.5 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 transition-colors" title="إلغاء التفعيل">
+                            {product.isActive ? 'نشط' : 'غير نشط'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button
+                              onClick={() => openEdit(product)}
+                              className="p-2 rounded-xl bg-slate-800 hover:bg-blue-500/20 hover:text-blue-400 text-slate-400 transition-colors"
+                              title="تعديل"
+                            >
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                               </svg>
                             </button>
-                          )}
-                          <button onClick={() => setDeleteConfirm(product)} className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors" title="حذف نهائي">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div className="px-5 py-3 border-t border-slate-800 text-xs text-slate-600">
-                {filtered.length} من {products.length} منتج
+                            {product.isActive && (
+                              <button
+                                onClick={() => setDeactivateConfirm(product)}
+                                className="p-2 rounded-xl bg-slate-800 hover:bg-amber-500/20 hover:text-amber-400 text-slate-400 transition-colors"
+                                title="إلغاء التفعيل"
+                              >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                </svg>
+                              </button>
+                            )}
+                            <button
+                              onClick={() => setDeleteConfirm(product)}
+                              className="p-2 rounded-xl bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 transition-colors"
+                              title="حذف نهائي"
+                            >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4" />
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="px-6 py-4 bg-slate-950/40 border-t border-slate-800 text-xs text-slate-500 flex justify-between items-center">
+                <span>عرض {filtered.length} من إجمالي {products.length} منتج</span>
               </div>
             </div>
           )}
@@ -349,7 +407,7 @@ export function ProductsPage() {
       )}
 
       {/* Add/Edit Modal */}
-      <Modal isOpen={modalOpen} onClose={closeModal} title={editTarget ? `تعديل: ${editTarget.name}` : 'إضافة منتج جديد'}>
+      <Modal isOpen={modalOpen} onClose={closeModal} title={editTarget ? `تعديل المنتج: ${editTarget.name}` : 'إضافة منتج جديد'}>
         {saveError && <div className="mb-4"><Alert type="error" message={saveError} /></div>}
         <ProductForm
           initial={editTarget ?? undefined}
@@ -360,16 +418,16 @@ export function ProductsPage() {
         />
       </Modal>
 
-      {/* Deactivate Confirm */}
+      {/* Deactivate Confirm Modal */}
       <Modal isOpen={!!deactivateConfirm} onClose={() => setDeactivateConfirm(null)} title="تأكيد إلغاء التفعيل">
-        <p className="text-slate-300 mb-6">
-          هل تريد إلغاء تفعيل المنتج <span className="font-bold text-white">"{deactivateConfirm?.name}"</span>؟
+        <p className="text-slate-300 mb-6 text-sm">
+          هل أنت متأكد من إلغاء تفعيل المنتج <span className="font-bold text-white">"{deactivateConfirm?.name}"</span>؟
           <br />
-          <span className="text-sm text-slate-500 mt-1 block">سيتم إخفاء المنتج دون حذفه نهائياً من قاعدة البيانات.</span>
+          <span className="text-xs text-slate-500 mt-1 block">سيتم إخفاء المنتج من قوائم الاختيار دون حذف السجل نهائياً.</span>
         </p>
         <div className="flex gap-3">
-          <button onClick={handleDeactivate} disabled={deactivateLoading} className="flex-1 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold text-sm hover:bg-amber-500/20 transition-colors disabled:opacity-50">
-            {deactivateLoading ? 'جاري التنفيذ...' : 'إلغاء التفعيل'}
+          <button onClick={handleDeactivate} disabled={deactivateLoading} className="flex-1 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold text-sm hover:bg-amber-500/25 transition-colors disabled:opacity-50">
+            {deactivateLoading ? 'جاري التنفيذ...' : 'تأكيد إلغاء التفعيل'}
           </button>
           <button onClick={() => setDeactivateConfirm(null)} className="flex-1 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-medium text-sm hover:bg-slate-700 transition-colors">
             إلغاء
@@ -377,16 +435,16 @@ export function ProductsPage() {
         </div>
       </Modal>
 
-      {/* Delete Confirm */}
+      {/* Delete Confirm Modal */}
       <Modal isOpen={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="تأكيد الحذف النهائي">
-        <p className="text-slate-300 mb-6">
-          هل تريد حذف المنتج <span className="font-bold text-white">"{deleteConfirm?.name}"</span> نهائياً؟
+        <p className="text-slate-300 mb-6 text-sm">
+          هل أنت متأكد من حذف المنتج <span className="font-bold text-white">"{deleteConfirm?.name}"</span> نهائياً؟
           <br />
-          <span className="text-sm text-rose-400 mt-1 block">هذا الإجراء لا يمكن التراجع عنه وسيتم حذف السجل من قاعدة البيانات.</span>
+          <span className="text-xs text-rose-400 mt-1 block">تحذير: هذا الإجراء نهائي ولا يمكن التراجع عنه.</span>
         </p>
         <div className="flex gap-3">
-          <button onClick={handleDelete} disabled={deleteLoading} className="flex-1 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-bold text-sm hover:bg-rose-500/20 transition-colors disabled:opacity-50">
-            {deleteLoading ? 'جاري التنفيذ...' : 'حذف نهائي'}
+          <button onClick={handleDelete} disabled={deleteLoading} className="flex-1 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-bold text-sm hover:bg-rose-500/25 transition-colors disabled:opacity-50">
+            {deleteLoading ? 'جاري الحذف...' : 'حذف نهائي'}
           </button>
           <button onClick={() => setDeleteConfirm(null)} className="flex-1 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-medium text-sm hover:bg-slate-700 transition-colors">
             إلغاء
@@ -396,3 +454,5 @@ export function ProductsPage() {
     </div>
   );
 }
+
+export default ProductsPage;

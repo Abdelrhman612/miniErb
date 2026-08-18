@@ -519,3 +519,40 @@ export interface UpdateAccountDto {
   isGroup: boolean;
   isActive: boolean;
 }
+
+export interface LoginRequestDto {
+  username: string;
+  password: string;
+}
+
+export interface CreateUserDto {
+  username: string;
+  password: string;
+  displayName: string;
+  role: string;
+}
+
+export interface AuthResponseDto {
+  token: string;
+  username: string;
+  displayName: string;
+  role: string;
+}
+
+export interface CurrentUserResponseDto {
+  id: number;
+  username: string;
+  displayName: string;
+  role: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface UserResponseDto {
+  id: number;
+  username: string;
+  displayName: string;
+  role: string;
+  isActive: boolean;
+  createdAt: string;
+}

@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<Category> Categories => Set<Category>();
+    public DbSet<User> Users => Set<User>();
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Warehouse> Warehouses => Set<Warehouse>();
     public DbSet<Customer> Customers => Set<Customer>();
@@ -49,5 +50,6 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new PaymentVoucherConfiguration());
         modelBuilder.ApplyConfiguration(new JournalVoucherConfiguration());
         modelBuilder.ApplyConfiguration(new JournalVoucherItemConfiguration());
+        modelBuilder.ApplyConfiguration(new UserConfiguration());
     }
 }

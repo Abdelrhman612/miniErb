@@ -37,6 +37,7 @@ public class ExceptionHandlingMiddleware
             NotFoundException => (HttpStatusCode.NotFound, exception.Message),
             BusinessRuleException => (HttpStatusCode.BadRequest, exception.Message),
             ConflictException => (HttpStatusCode.Conflict, exception.Message),
+            UnauthorizedException => (HttpStatusCode.Unauthorized, exception.Message),
             _ => (HttpStatusCode.InternalServerError, "حدث خطأ داخلي في الخادم. يرجى المحاولة لاحقاً.")
         };
 

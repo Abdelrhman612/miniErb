@@ -17,3 +17,9 @@ public class ConflictException : Exception
 {
     public ConflictException(string message) : base(message) { }
 }
+
+/// <summary>Thrown when authentication fails or user is unauthorized.</summary>
+public class UnauthorizedException : Exception
+{
+    public UnauthorizedException(string message) : base(message) { }
+}

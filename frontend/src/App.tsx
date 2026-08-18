@@ -1,4 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
+import { AuthProvider } from './contexts/AuthContext';
+import { ToastProvider } from './components/ui/Toast';
+import { ProtectedRoute } from './components/common/ProtectedRoute';
+import { LoginPage } from './pages/LoginPage';
+import { UsersManagementPage } from './pages/UsersManagementPage';
 import { MainLayout } from './components/layout/MainLayout';
 import { ProductsPage } from './pages/ProductsPage';
 import { CategoriesPage } from './pages/CategoriesPage';
@@ -21,28 +26,43 @@ import './index.css';
 function App() {
   return (
     <BrowserRouter>
-      <MainLayout>
-        <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/categories" element={<CategoriesPage />} />
-          <Route path="/warehouses" element={<WarehousesPage />} />
-          <Route path="/warehouses/:id" element={<WarehouseDetailsPage />} />
-          <Route path="/chart-of-accounts" element={<ChartOfAccountsPage />} />
-          <Route path="/treasury" element={<TreasuryPage />} />
-          <Route path="/customers" element={<CustomersPage />} />
-          <Route path="/customers/:id/account" element={<CustomerAccountPage />} />
-          <Route path="/suppliers" element={<SuppliersPage />} />
-          <Route path="/suppliers/:id/account" element={<SupplierAccountPage />} />
-          <Route path="/purchase-invoices" element={<PurchaseInvoicesPage />} />
-          <Route path="/sales/invoices" element={<SalesInvoicesPage />} />
-          <Route path="/sales-invoices" element={<SalesInvoicesPage />} />
-          <Route path="/receipt-vouchers" element={<ReceiptVouchersPage />} />
-          <Route path="/payment-vouchers" element={<PaymentVouchersPage />} />
-          <Route path="/journal-vouchers" element={<JournalVouchersPage />} />
-        </Routes>
-      </MainLayout>
+      <AuthProvider>
+        <ToastProvider>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route element={<ProtectedRoute />}>
+              <Route
+                path="/*"
+                element={
+                  <MainLayout>
+                    <Routes>
+                      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                      <Route path="/dashboard" element={<DashboardPage />} />
+                      <Route path="/products" element={<ProductsPage />} />
+                      <Route path="/categories" element={<CategoriesPage />} />
+                      <Route path="/warehouses" element={<WarehousesPage />} />
+                      <Route path="/warehouses/:id" element={<WarehouseDetailsPage />} />
+                      <Route path="/chart-of-accounts" element={<ChartOfAccountsPage />} />
+                      <Route path="/treasury" element={<TreasuryPage />} />
+                      <Route path="/customers" element={<CustomersPage />} />
+                      <Route path="/customers/:id/account" element={<CustomerAccountPage />} />
+                      <Route path="/suppliers" element={<SuppliersPage />} />
+                      <Route path="/suppliers/:id/account" element={<SupplierAccountPage />} />
+                      <Route path="/purchase-invoices" element={<PurchaseInvoicesPage />} />
+                      <Route path="/sales/invoices" element={<SalesInvoicesPage />} />
+                      <Route path="/sales-invoices" element={<SalesInvoicesPage />} />
+                      <Route path="/receipt-vouchers" element={<ReceiptVouchersPage />} />
+                      <Route path="/payment-vouchers" element={<PaymentVouchersPage />} />
+                      <Route path="/journal-vouchers" element={<JournalVouchersPage />} />
+                      <Route path="/users" element={<UsersManagementPage />} />
+                    </Routes>
+                  </MainLayout>
+                }
+              />
+            </Route>
+          </Routes>
+        </ToastProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

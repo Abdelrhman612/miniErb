@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Alert } from '../components/ui/Alert';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { Modal } from '../components/ui/Modal';
+import { SearchableSelect } from '../components/ui/SearchableSelect';
 import {
     salesInvoiceService,
     customerService,
@@ -211,37 +212,35 @@ function SalesInvoiceForm({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5">العميل *</label>
-                    <select
+                    <SearchableSelect
+                        label="العميل"
+                        required
                         value={customerId}
-                        onChange={e => setCustomerId(Number(e.target.value))}
+                        onChange={(val) => setCustomerId(Number(val))}
+                        options={activeCustomers.map(c => ({
+                            value: c.id,
+                            label: c.name,
+                            subLabel: c.phone
+                        }))}
+                        placeholder="اختر أو ابحث عن العميل..."
                         disabled={saving}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                    >
-                        <option value={0}>اختر العميل</option>
-                        {activeCustomers.map(c => (
-                            <option key={c.id} value={c.id}>
-                                {c.name} ({c.phone})
-                            </option>
-                        ))}
-                    </select>
+                    />
                 </div>
 
                 <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5">المستودع *</label>
-                    <select
+                    <SearchableSelect
+                        label="المستودع"
+                        required
                         value={warehouseId}
-                        onChange={e => setWarehouseId(Number(e.target.value))}
+                        onChange={(val) => setWarehouseId(Number(val))}
+                        options={activeWarehouses.map(w => ({
+                            value: w.id,
+                            label: w.name,
+                            subLabel: w.code
+                        }))}
+                        placeholder="اختر أو ابحث عن المستودع..."
                         disabled={saving}
-                        className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                    >
-                        <option value={0}>اختر المستودع</option>
-                        {activeWarehouses.map(w => (
-                            <option key={w.id} value={w.id}>
-                                {w.name} ({w.code})
-                            </option>
-                        ))}
-                    </select>
+                    />
                 </div>
 
                 <div>
